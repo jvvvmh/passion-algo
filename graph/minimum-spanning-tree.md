@@ -8,7 +8,7 @@
 
 边排序，只要不形成环（并查集），就加入，直到有 n - 1 条边为止。
 
-### 力扣1584. 连接所有点的最小费用 (Kruskal)
+### 力扣1584. 连接所有点的最小费用
 
 给定一些点的坐标，cost 是曼哈顿距离，求连通所有点的最小费用。
 
@@ -59,16 +59,18 @@ class Solution:
         return res
 ```
 
-### Prime 算法
+### Prim 算法
 
-visited 和 unvisited。每次新加一个点到 visited 就更新横切边。在横切边种，选最小的加入，然后更新 visited。
+visited 和 unvisited。每次新加一个点到 visited 就更新横切边。在横切边中，选最小的加入，然后更新 visited。
+
+- 力扣1584. 连接所有点的最小费用
 
 ```python
 import heapq
 class Solution:
     def minCostConnectPoints(self, points: List[List[int]]) -> int:
 
-        # Prime: visited / unvisited 切边中最小的。
+        # Prim: visited / unvisited 切边中最小的。
         # 每次多一个新 visited 的点，更新切边
         # 初始 visited = [0]
 
