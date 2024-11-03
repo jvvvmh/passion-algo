@@ -235,3 +235,74 @@ class Solution:
 
 ```
 
+
+
+### [363. Max Sum of Rectangle No Larger Than K](https://leetcode.cn/problems/max-sum-of-rectangle-no-larger-than-k/)
+
+枚举矩形的上下边界，并计算出该边界内每列的元素和，则原问题转换成了如下一维问题：
+
+给定一个整数数组和一个整数 *k*，计算该数组的最大区间和，要求区间和不超过 *k*。
+
+$S_r - S_l \le k$ 
+
+=> $S_l \ge S_r - k$  尽可能小的 $S_l$
+
+
+
+```c++
+class Solution {
+public:
+    int maxSumSubmatrix(vector<vector<int>> &matrix, int k) {
+        int ans = INT_MIN;
+        int m = matrix.size(), n = matrix[0].size();
+        for (int i = 0; i < m; ++i) { // 枚举上边界
+            vector<int> sum(n);
+            for (int j = i; j < m; ++j) { // 枚举下边界
+                for (int c = 0; c < n; ++c) {
+                    sum[c] += matrix[j][c]; // 更新每列的元素和
+                }
+                set<int> sumSet{0};
+                int s = 0;
+                for (int v : sum) {
+                    s += v;
+                    auto lb = sumSet.lower_bound(s - k);
+                    if (lb != sumSet.end()) {
+                        ans = max(ans, s - *lb);
+                    }
+                    sumSet.insert(s);
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+
+
+from sortedcontainers import SortedList
+
+class Solution:
+    def maxSumSubmatrix(self, matrix: List[List[int]], k: int) -> int:
+        ans = float("-inf")
+        m, n = len(matrix), len(matrix[0])
+
+        for i in range(m):   # 枚举上边界
+            total = [0] * n
+            for j in range(i, m):   # 枚举下边界
+                for c in range(n):
+                    total[c] += matrix[j][c]   # 更新每列的元素和
+                
+                totalSet = SortedList([0])
+                s = 0
+                for v in total:
+                    s += v
+                    lb = totalSet.bisect_left(s - k)
+                    if lb != len(totalSet):
+                        ans = max(ans, s - totalSet[lb])
+                    totalSet.add(s)
+
+        return ans
+```
+
+ 
+
