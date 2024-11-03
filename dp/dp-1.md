@@ -128,3 +128,20 @@ class Solution:
         # return best_cnt
 ```
 
+
+
+### [354. Russian Doll Envelopes](https://leetcode.cn/problems/russian-doll-envelopes/)
+
+One envelope can fit into another if and only if both the width and height of one envelope are greater than the other envelope's width and height.
+
+1. sorted by (width, -height) 确保相同 width，height 递减，从而不会出现一边相同，一边严格上升的情况
+2. LIS of height
+
+
+
+
+
+
+
+
+
