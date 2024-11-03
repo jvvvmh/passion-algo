@@ -137,9 +137,101 @@ One envelope can fit into another if and only if both the width and height of on
 1. sorted by (width, -height) 确保相同 width，height 递减，从而不会出现一边相同，一边严格上升的情况
 2. LIS of height
 
+### [152. Maximum Product Subarray](https://leetcode.cn/problems/maximum-product-subarray/)
+
+```python
+class Solution:
+    def maxProduct(self, nums: List[int]) -> int:
+        prev_max = nums[0]
+        prev_min = nums[0]
+        ans = nums[0]
+        for x in nums[1:]:
+            arr = [x, x * prev_max, x * prev_min]
+            prev_max, prev_min = max(arr), min(arr)
+            ans = max(ans, prev_max)
+        return ans
+```
 
 
 
+### [918. Maximum Sum Circular Subarray](https://leetcode.cn/problems/maximum-sum-circular-subarray/)
 
+```python
+class Solution:
+    def maxSubarraySumCircular(self, nums: List[int]) -> int:
+        n = len(nums)
 
+        # 最大和
+        max_s = nums[0]
+        prev = nums[0]
+        for x in nums[1:]:
+            prev = max(prev + x, x)
+            max_s = max(max_s, prev)
+        
+        # 总的扣去最小和 1 xxxxx n
+        min_s = 0
+        prev = 0
+        for x in nums[1: -1]:
+            prev = min(prev + x, x)
+            min_s = min(min_s, prev)
+     
+        return max(max_s, sum(nums) - min_s)
+```
+
+### [面试题 17.24. Max Submatrix LCCI](https://leetcode.cn/problems/max-submatrix-lcci/)
+
+Find the submatrix with the largest possible sum.
+
+```python
+import numpy as np
+class Solution:
+    def getMaxMatrix(self, matrix: List[List[int]]) -> List[int]:
+        m, n = len(matrix), len(matrix[0])
+
+        # 遍历 row i->j 的组合，求 column sum 的最大子数组
+        
+        for i in range(1, m):
+            for j in range(n):
+                matrix[i][j] += matrix[i - 1][j]
+
+        def colSum(i, j):
+            if i - 1 >= 0:
+                return [matrix[j][k] - matrix[i - 1][k] for k in range(len(matrix[j]))]
+            return matrix[j]
+
+        def maxSubArr(arr):
+            prevSum = arr[0]
+            prevStart = 0
+            bestSum = arr[0]
+            bestStart = 0
+            bestEnd = 0
+            for i in range(1, len(arr)):
+                x = arr[i]
+                if prevSum > 0:
+                    prevSum = prevSum + x
+                else:
+                    prevSum = x
+                    prevStart = i
+                if prevSum > bestSum:
+                    bestSum = prevSum
+                    bestStart = prevStart
+                    bestEnd = i
+            return bestStart, bestEnd, bestSum
+
+        r1, r2 = 0, 0
+        c1, c2 = 0, 0
+        bestSum = matrix[0][0]
+
+        for i in range(m):
+            for j in range(i, m):
+                arr = colSum(i, j)
+                st, ed, curr = maxSubArr(arr)
+                if curr > bestSum:
+                    bestSum = curr
+                    r1, r2 = i, j
+                    c1, c2 = st, ed
+
+        return [r1, c1, r2, c2]
+
+```
 
