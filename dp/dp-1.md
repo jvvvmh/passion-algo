@@ -306,3 +306,154 @@ class Solution:
 
  
 
+### [1388. Pizza With 3n Slices](https://leetcode.cn/problems/pizza-with-3n-slices/)
+
+```python
+class Solution:
+    def maxSizeSlices(self, slices: List[int]) -> int:
+        # 给一个长度为 3n 的环状序列，选 n 个数，任意两个数不能相邻，求这 n 个数和的最大值。
+
+        # f[i][j] 表示在长度为i的数组中选取j个不相邻的点所能取得的最大收益
+        # j <= (i + 1) // 2
+        # f[i][j] = gain[i-1] + f[i-2][j-1] or f[i-1][j]
+        
+        def run(arr, k):
+            f = [[0]]
+            for i in range(1, len(arr) + 1):
+                f.append([])
+                for j in range(0, (i + 1) // 2 + 1):
+                    if j == 0:
+                        f[-1].append(0)
+                        continue
+                    tmp = float('-inf')
+                    if j < len(f[i - 1]):
+                        tmp = max(tmp, f[i - 1][j])
+                    v1 = arr[i - 1]
+                    v2 = 0 if j == 1 else f[i - 2][j - 1] if i - 2 >= 0 and j - 1 < len(f[i - 2]) else float('-inf')
+                    tmp = max(tmp, v1 + v2)
+                    f[-1].append(tmp)
+            return f[-1][k]
+        
+        return max(run(slices[1:], len(slices) // 3), run(slices[:-1], len(slices) // 3)) # 第一个和最后一个不能同时取到
+```
+
+### [873. Length of Longest Fibonacci Subsequence](https://leetcode.cn/problems/length-of-longest-fibonacci-subsequence/)
+
+```
+Input: arr = [1,2,3,4,5,6,7,8]
+Output: 5
+Explanation: The longest subsequence that is fibonacci-like: [1,2,3,5,8].
+```
+
+```python
+class Solution:
+    def lenLongestFibSubseq(self, arr: List[int]) -> int:
+        f = defaultdict(int)
+        max_len = 0
+        lastAppear = {}
+        for i, x in enumerate(arr):
+            lastAppear[x] = i
+    
+        for i in range(2, len(arr)):
+            for j in range(1, i):
+                ask = arr[i] - arr[j]
+                idx = lastAppear.get(ask, -1)
+                if idx >= j or idx == -1:
+                    continue
+                # idx -> j -> i 是一组，判断 .... -> idx -> j能有多少组
+                f[(j, i)] = max(f[(j, i)], f.get((idx, j), 2) + 1)
+                max_len = max(max_len, f[(j, i)])
+        return max_len  
+```
+
+
+
+### [1027. 最长等差数列](https://leetcode.cn/problems/longest-arithmetic-subsequence/)
+
+```python
+class Solution:
+    def longestArithSeqLength(self, nums: List[int]) -> int:
+        diff = max(nums) - min(nums)
+        ans = 1
+        for d in range(-diff, diff + 1): # 枚举等差 d
+            f = dict()
+            for x in nums:
+                # x 单独成为一个序列 /
+                # x -> (x-d)
+                tmp = 1 + f[x - d] if x - d in f else 1
+                f[x] = max(tmp, f.get(x, 1))
+                ans = max(ans, tmp)
+        return ans
+```
+
+
+
+### [1055. 形成字符串的最短路径](https://leetcode.cn/problems/shortest-way-to-form-string/)
+
+```
+输入：source = "xyz", target = "xzyxz"
+输出：3
+解释：目标字符串可以按如下方式构建： "xz" + "y" + "xz"。
+```
+
+```python
+import bisect
+
+class Solution:
+    def shortestWay(self, source: str, target: str) -> int:
+        src_set = set(source)
+        for x in target:
+            if x not in src_set:
+                return -1
+
+        srcPlaces = defaultdict(list)
+        for i, x in enumerate(source):
+            srcPlaces[x].append(i)
+        
+        ans = 1
+        srcIdx = 0
+        for t in target:
+            # [....] 中 >= srcIdx 的第一个数
+            i = bisect.bisect_left(srcPlaces[t], srcIdx)
+            if i == len(srcPlaces[t]):
+                # 需要重新开启一个新串
+                ans += 1
+                srcIdx = bisect.bisect_left(srcPlaces[t], 0)
+                srcIdx = srcPlaces[t][srcIdx]
+            else:
+                srcIdx = srcPlaces[t][i]
+            srcIdx += 1
+        return ans
+```
+
+
+
+### [368. 最大整除子集](https://leetcode.cn/problems/largest-divisible-subset/)
+
+```python
+class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -> List[int]:
+        nums = sorted(nums)
+        f = [1] * len(nums)
+        prev = [i for i in range(len(nums))]
+        bestL = 1
+        bestIdx = 0
+        for i in range(1, len(nums)):
+            for j in range(i):
+                if nums[i] % nums[j] == 0:
+                    if f[j] + 1 > f[i]:
+                        f[i] = f[j] + 1
+                        prev[i] = j
+                        if f[i] > bestL:
+                            bestL = f[i]
+                            bestIdx = i
+        res = []
+        while True:
+            res.append(nums[bestIdx])
+            if bestIdx == prev[bestIdx]:
+                break
+            bestIdx = prev[bestIdx]
+        reversed(res)
+        return res
+```
+
