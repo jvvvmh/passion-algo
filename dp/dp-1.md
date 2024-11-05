@@ -457,3 +457,36 @@ class Solution:
         return res
 ```
 
+### [32. Longest Valid Parentheses](https://leetcode.cn/problems/longest-valid-parentheses/)
+
+Given a string containing just the characters `'('` and `')'`, return *the length of the longest valid (well-formed) parentheses* *substring*.
+
+```python
+class Solution:
+    def longestValidParentheses(self, s: str) -> int:
+        leftCnt, rightCnt = 0, 0
+        res = 0
+        for ch in s:
+            if ch == '(':
+                leftCnt += 1
+            else:
+                rightCnt += 1
+            if leftCnt == rightCnt:
+                res = max(res, leftCnt)
+            elif rightCnt > leftCnt:
+                leftCnt, rightCnt = 0, 0
+ 
+        leftCnt, rightCnt = 0, 0
+        for ch in s[::-1]:
+            if ch == '(':
+                leftCnt += 1
+            else:
+                rightCnt += 1
+            if leftCnt == rightCnt:
+                res = max(res, leftCnt)
+            elif leftCnt > rightCnt:
+                leftCnt, rightCnt = 0, 0
+
+        return res * 2
+```
+
