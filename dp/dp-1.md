@@ -507,3 +507,37 @@ class Solution:
         return res
 ```
 
+
+
+[338. Counting Bits](https://leetcode.cn/problems/counting-bits/)
+
+Given an integer `n`, return *an array* `ans` *of length* `n + 1` *such that for each* `i` (`0 <= i <= n`)*,* `ans[i]` *is the **number of*** `1`***'s** in the binary representation of* `i`.
+
+**Example 2:**
+
+```
+Input: n = 5
+Output: [0,1,1,2,1,2]
+Explanation:
+0 -->   0
+1 -->   1
+2 -->  10
+3 -->  11
+4 --> 100
+5 --> 101
+```
+
+```python
+class Solution:
+    def countBits(self, n: int) -> List[int]:
+        # x:  ...... 1 0 0
+        # x-1:.......0 1 1
+
+        # x & (x-1) set the lowest 1 in x to 0
+        # f[x] = f[x & (x-1)] + 1
+        f = [0] * (n + 1)
+        for i in range(1, n + 1):
+            f[i] = f[i & (i - 1)] + 1
+        return f
+```
+
