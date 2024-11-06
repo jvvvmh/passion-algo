@@ -488,5 +488,22 @@ class Solution:
                 leftCnt, rightCnt = 0, 0
 
         return res * 2
+    
+    
+class Solution:
+    def longestValidParentheses(self, s: str) -> int:
+        stk = [(-1, ')')]
+        res = 0
+        for i, ch in enumerate(s):
+            if ch == '(':
+                stk.append((i, ch))
+            else:
+                _, head = stk.pop()
+                if head == '(':
+                    res = max(res, i - stk[-1][0])
+                    print(i, stk[-1][0])
+                else:
+                    stk.append((i, ')'))
+        return res
 ```
 
