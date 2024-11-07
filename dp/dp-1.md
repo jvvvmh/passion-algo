@@ -581,3 +581,35 @@ class Solution:
         return ans
 ```
 
+### [813. Largest Sum of Averages](https://leetcode.cn/problems/largest-sum-of-averages/)
+
+You are given an integer array `nums` and an integer `k`. You can partition the array into **at most** `k` non-empty adjacent subarrays. The **score** of a partition is the sum of the averages of each subarray.
+
+Return *the maximum **score** you can achieve of all the possible partitions*. 
+
+首先证明需要用尽 k 因为都是正数。
+
+```python
+class Solution:
+    def largestSumOfAverages(self, nums: List[int], k: int) -> float:
+        # dp[i][j]: 枚举最后一组的起始下标 lastStart, lastStart之前一共有lastStart个数字, lastStart >= j - 1
+        # 前 i 个数字 分成 j 组
+        # j = 1, 2, ..., i
+        s = [0] * (len(nums) + 1)
+        for i, x in enumerate(nums):
+            s[i + 1] = s[i] + x
+        def avg(i, j):
+          
+            return (s[j + 1] - s[i]) / (j - i + 1)
+        
+        dp = [[0] * (k + 1) for i in range(len(nums) + 1)]
+        for i in range(1, len(nums) + 1):
+            for j in range(1, min(i + 1, k + 1)):
+                dp[i][j] = 0
+                for lastStart in range(j - 1, i):
+                    if lastStart > 0 and j - 1 == 0: continue
+                    dp[i][j] = max(dp[i][j], dp[lastStart][j - 1] + avg(lastStart, i - 1))
+        return dp[len(nums)][k]
+
+```
+
