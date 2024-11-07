@@ -541,3 +541,43 @@ class Solution:
         return f
 ```
 
+### [871. 最低加油次数](https://leetcode.cn/problems/minimum-number-of-refueling-stops/)
+
+```python
+class Solution:
+    def minRefuelStops(self, target: int, startFuel: int, stations: List[List[int]]) -> int:
+
+        # # f[i]: 加油 i 次能走多远. O(N2)
+        # dp = [0] * (len(stations) + 1)
+        # dp[0] = startFuel
+        # if dp[0] >= target:
+        #     return 0
+        
+        # for i, [stationPos, fuel] in enumerate(stations): # 枚举最后一次加油的位置
+        #     # 第 i 个加油站前最多加油 i 次
+        #     for j in range(i, -1, -1):
+        #         if dp[j] >= stationPos:
+        #             dp[j + 1] = max(dp[j + 1], dp[j] + fuel)
+        # return next((i for i, v in enumerate(dp) if v >= target), -1)
+
+        # 贪心
+        fuelRemain = startFuel
+        prevPos = 0
+        ans = 0
+        fuelCandidates = []
+        stations.append((target, 0))
+        
+        for i, (stationPos, fuel) in enumerate(stations):
+            fuelRemain -= (stationPos - prevPos)
+            while fuelRemain < 0 and fuelCandidates:
+                selectedFuel, selectedPos = heapq.heappop(fuelCandidates)
+                selectedFuel = -selectedFuel
+                fuelRemain += selectedFuel
+                ans += 1
+            if fuelRemain < 0:
+                return -1
+            heapq.heappush(fuelCandidates, (-fuel, stationPos))
+            prevPos = stationPos
+        return ans
+```
+
