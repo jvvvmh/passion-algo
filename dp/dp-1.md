@@ -613,3 +613,4 @@ class Solution:
 
 ```
 
+[887. Super Egg Drop](https://leetcode.cn/problems/super-egg-drop/)
