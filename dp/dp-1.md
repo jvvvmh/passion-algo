@@ -614,3 +614,83 @@ class Solution:
 ```
 
 [887. Super Egg Drop](https://leetcode.cn/problems/super-egg-drop/)
+
+<img src="images\egg-floor.PNG" alt="egg-floor" style="zoom:51%;" />
+
+```python
+class Solution:
+    def superEggDrop(self, k: int, n: int) -> int:
+        # k * n * log(n)
+        d = {}
+        def f(k, n):
+            if (k, n) in d:
+                return d[(k, n)]
+            if n == 0:
+                return 0
+            if k == 1:
+                return n
+            l, r = 1, n
+            
+            while l < r:
+                mid = (l + r) // 2
+                v1 = f(k - 1, mid - 1)
+                v2 = f(k, n - mid)
+                if v1 == v2:
+                    d[(k, n)] = 1 + v1
+                    return d[(k, n)] 
+                elif v1 < v2:
+                    l, r = mid + 1, r
+                else:
+                    l, r = l, mid - 1
+            # 现在 l == r
+            if l - 1 > 0:
+                l -= 1
+
+            d[(k, n)] = 1 + min(max(f(k - 1, l - 1), f(k, n - l)), max(f(k - 1, r - 1), f(k, n - r)))
+            
+            return d[(k, n)]
+        
+        return f(k, n)
+
+        # (k * n)
+        # 固定k, x_opt随着n单调增加
+        f1 = [i for i in range(n + 1)] # k=1 只有一个鸡蛋，最差情况下从下而上走完所有层数
+        f2 = [i for i in range(n + 1)]
+        for egg in range(2, min(k, n) + 1):
+            ans = 1
+            for floor in range(2, n + 1):
+                for x in range(ans, floor + 1):
+                    if f1[x - 1] > f2[floor - x]:
+                        break
+                l, r = x - 1, x
+                if max(f1[l - 1], f2[floor - l]) < max(f1[r - 1], f2[floor - r]):
+                    f2[floor] = max(f1[l - 1], f2[floor - l]) + 1
+                    ans = l
+                else:
+                    f2[floor] = max(f1[r - 1], f2[floor - r]) + 1
+                    ans = r
+            f1 = f2[:]
+        return f1[-1]
+
+
+        # 方法3:
+        # f[t次][k个鸡蛋] 最多能区分多少层
+        # 不必思考到底在哪里扔这个鸡蛋，我们只需要扔出一个鸡蛋，看看到底发生了什么
+        # 如果鸡蛋没有碎，在上方能区分 [t-1][k]
+        # 如果鸡蛋碎了，在下方能区分 f[t-1][k-1]
+        # f[t][k] = 1 + f[t-1][k-1] + f[t-1][k]
+        
+        if n == 1:
+            return 1
+        
+        f = [1] * (k + 1) # t = 1
+        f[0] = 0
+        for t in range(2, n + 1):
+            g = [0] * (k + 1)
+            for j in range(1, k + 1):
+                g[j] = 1 + f[j - 1] + f[j]
+            if g[k] >= n:
+                return t
+            f = g[:]
+```
+
