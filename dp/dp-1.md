@@ -613,7 +613,7 @@ class Solution:
 
 ```
 
-[887. Super Egg Drop](https://leetcode.cn/problems/super-egg-drop/)
+### [887. Super Egg Drop](https://leetcode.cn/problems/super-egg-drop/)
 
 <img src="images\egg-floor.PNG" alt="egg-floor" style="zoom:51%;" />
 
@@ -692,5 +692,48 @@ class Solution:
             if g[k] >= n:
                 return t
             f = g[:]
+```
+
+### [975. Odd Even Jump](https://leetcode.cn/problems/odd-even-jump/) 单调栈求next数组
+
+```python
+class Solution:
+    def oddEvenJumps(self, arr: List[int]) -> int:
+        oddNext = [-1] * len(arr) # 最小的（然后是最近的）>= 自己的数字
+        evenNext = [-1] * len(arr)
+
+        # 数字从小到大排，相同则小index优先
+        N = len(arr)
+        inc = sorted([i for i in range(N)], key=lambda i: (arr[i], i))
+        s = []
+        for idx in inc:
+            while s:
+                loc = s[-1]
+                if loc < idx:
+                    oddNext[loc] = idx
+                    s.pop()
+                else:
+                    break
+            s.append(idx)
+        dec = sorted([i for i in range(N)], key=lambda i: (-arr[i], i))
+        s = []
+        for idx in dec:
+            while s:
+                loc = s[-1]
+                if loc < idx:
+                    evenNext[loc] = idx
+                    s.pop()
+                else:
+                    break
+            s.append(idx)
+
+        oddReachTail = [False] * (len(arr) - 1) + [True]
+        evenReachTail = [False] * (len(arr) - 1) + [True]
+        for idx in range(len(arr) - 2, -1, -1):
+            if oddNext[idx] != -1:
+                oddReachTail[idx] = evenReachTail[oddNext[idx]]
+            if evenNext[idx] != -1:
+                evenReachTail[idx] = oddReachTail[evenNext[idx]]
+        return sum(oddReachTail)
 ```
 
