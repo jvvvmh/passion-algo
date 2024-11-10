@@ -831,3 +831,96 @@ class Solution:
         return ans
 ```
 
+### [1473. Paint House III](https://leetcode.cn/problems/paint-house-iii/)
+
+把房子正好涂成target个block，每个block的颜色相同。有的房子已经有颜色了。
+
+```python
+class Solution:
+    def minCost(self, houses: List[int], cost: List[List[int]], m: int, n: int, target: int) -> int:
+        # f[i个house][j个街区][最后一个颜色是??]
+        # f[i-1][j][最后一个颜色是k] & 第i个house也要涂成k
+        # f[i-1][j-1][最后一个颜色是k] & 第i个house涂其他颜色
+
+        # first house, paintable colors
+        f = {}
+        def availableColors(i):
+            if houses[i - 1]:
+                return (houses[i - 1],)
+            return range(1, n + 1)
+
+        if houses[0]:
+            f[(1, houses[0])] = 0
+        else:
+            for color in range(1, n + 1):
+                f[(1, color)] = cost[0][color - 1]
+
+        for i in range(2, len(houses) + 1):
+            g = {}
+            for j in range(1, min(target, i) + 1):
+                for color in availableColors(i):
+                    addCost = 0 if houses[i - 1] else cost[i - 1][color - 1] 
+                    # 上一个同色
+                    if (j, color) in f:
+                        g[(j, color)] = f[(j, color)] + addCost
+                    # 上一个不同色:
+                    for diffColor in range(1, n + 1):
+                        if diffColor != color and (j - 1, diffColor) in f:
+                            g[(j, color)] = min(
+                                g.get((j, color), float('inf')),
+                                f[(j - 1, diffColor)] + addCost
+                            )
+            if not g:
+                return -1
+            f = g
+        ans = float('inf')
+        for color in availableColors(len(houses)):
+            ans = min(ans, f.get((target, color), float('inf')))
+        return ans if ans != float('inf') else -1
+```
+
+### [188. Best Time to Buy and Sell Stock IV](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-iv/)
+
+Find the maximum profit you can achieve. You may complete at most `k` transactions: i.e. you may buy at most `k` times and sell at most `k` times.
+
+**Note:** You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+
+```python
+import numpy as np
+
+class Solution:
+    def maxProfit(self, k: int, prices: List[int]) -> int:
+        k = min(k , len(prices) // 2)
+        if k <= 0: return 0
+        buy = [float('-inf')] * (k + 1)
+        sell = [float('-inf')] * (k + 1)
+        buy[1] = -prices[0]
+        sell[0] = 0
+        for idx, p in enumerate(prices[1:]):
+            for i in range(1, min(k, (idx+ 2)//2 + 1) + 1):
+                buy[i], sell[i] = max(buy[i], sell[i - 1] - p), max(sell[i], buy[i] + p)
+        return max(sell)
+```
+
+### [309. Best Time to Buy and Sell Stock with Cooldown](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+
+任意多transactions
+
+After you sell your stock, you cannot buy stock on the next day (i.e., cooldown one day)
+
+```python
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        buy = -prices[0]
+        sell = 0
+        gap = 0
+        for price in prices[1:]:
+            # buy -> 维持原状 buy
+            # buy -> sell 获得 price
+            # sell -> gap
+            # gap -> buy, pay price
+            # gap -> gap
+            buy, sell, gap = max(buy, gap - price), buy + price, max(sell, gap)
+        return max(sell, gap)
+```
+
