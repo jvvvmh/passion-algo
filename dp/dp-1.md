@@ -737,3 +737,97 @@ class Solution:
         return sum(oddReachTail)
 ```
 
+### [1478. 安排邮筒](https://leetcode.cn/problems/allocate-mailboxes/)
+
+```python
+class Solution:
+    def minDistance(self, houses: List[int], k: int) -> int:
+        # dp[i][j]: 前i个房子分配j个筒 (1<=j<=i)
+        # dp[i][i] = 0
+        # dp[i][j] = min_{最后一组有x个元素} dp[i-x][j-1] + cost(i-x+1, i)
+
+        houses =sorted(houses)
+
+        N = len(houses)
+        if k >= N:
+            return 0
+    
+        s = [0]
+        for dist in houses:
+            s.append(dist + s[-1])
+    
+        def cost(i, j):
+            if i == j:
+                return 0
+            mid = (j + i) // 2
+            if (j - i + 1) % 2:
+                return s[j] - s[mid] - s[mid - 1] + s[i - 1]
+            else:
+                return s[j] - s[mid] - s[mid] + s[i - 1]
+
+        dp = {(0, 0): 0}
+        for i in range(1, N + 1):
+            for j in range(1, min(i, k) + 1):
+                for x in range(1, i - j + 2): # 前面没有冗余的筒，前面的筒有j-1个，后面最多有 i-(j-1)=i-j+1个元素
+                    dp[(i, j)] = min(dp.get((i, j), float('inf')), dp.get((i - x, j - 1), float('inf')) + cost(i - x + 1, i))
+        return dp[(N, k)]
+```
+
+
+
+### [410. 分割数组的最大值](https://leetcode.cn/problems/split-array-largest-sum/)
+
+```python
+class Solution:
+    def splitArray(self, nums: List[int], k: int) -> int:
+        
+        nums = [x for x in nums if x > 0]
+        k = min(k, len(nums))
+        if len(nums) == 0:
+            return 0
+        
+        # f[前i个数][分成j份] = min_x:: max{f[前x个数][分成j-1份], sum(第x+1个数 -> 第i个数)}
+        # f = {(0, 0): 0}
+        # N = len(nums)
+        # s = [0]
+        # for num in nums:
+        #     s.append(s[-1] + num)
+        
+        # for i in range(1, N + 1):
+        #     for j in range(1, min(k, i) + 1):
+        #         f[(i, j)] = float('inf')
+        #         for x in range(j - 1, i):
+        #             f[(i, j)] = min(
+        #                 f[(i, j)],
+        #                 max(f.get((x, j - 1), float('inf')), s[i] - s[x])
+        #                 )
+        # return f[(N, k)]
+
+        # 二分: max(nums) -> sum(nums)
+        def check(maxSum, k):
+            cnt = 1
+            tmp = 0
+            for i, num in enumerate(nums):
+                if num > maxSum:
+                    return False
+                tmp += num
+                if tmp > maxSum:
+                    cnt += 1
+                    tmp = num
+                    if cnt > k:
+                        return False
+            return True
+
+        l = max(nums)
+        r = sum(nums)
+        ans = float('inf')
+        while l <= r:
+            mid = (l + r) // 2
+            if check(mid, k):
+                ans = min(ans, mid)
+                r = mid - 1
+            else:
+                l = mid + 1
+        return ans
+```
+
