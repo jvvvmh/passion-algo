@@ -1,6 +1,8 @@
-## 动态规划：线性&区间动态
+# 动态规划：线性&区间动态
 
 [TOC]
+
+## 单串
 
 ### [300. Longest Increasing Subsequence](https://leetcode.cn/problems/longest-increasing-subsequence/)
 
@@ -924,3 +926,138 @@ class Solution:
         return max(sell, gap)
 ```
 
+### [714. Best Time to Buy and Sell Stock with Transaction Fee](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
+
+```python
+class Solution:
+    def maxProfit(self, prices: List[int], fee: int) -> int:
+        buy, sell = -prices[0] - fee, 0
+        for price in prices[1:]:
+            buy, sell = max(buy, sell - price - fee), max(sell, buy + price)
+        return sell
+```
+
+## 双串
+
+### [1143. Longest Common Subsequence](https://leetcode.cn/problems/longest-common-subsequence/)
+
+```python
+class Solution:
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+        # dp[i个字符][j个字符]
+        m, n = len(text1), len(text2)
+        dp = [[0] * (n + 1) for _ in range(m + 1)]
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                if text1[i - 1] == text2[j - 1]:
+                    dp[i][j] = 1 + dp[i - 1][j - 1]
+                else:
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+        return dp[m][n]
+
+class Solution:
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+        # dp[i个字符][j个字符]
+        m, n = len(text1), len(text2)
+        f = [0] * (n + 1)
+        for i in range(1, m + 1):
+            g = [0] * (n + 1)
+            for j in range(1, n + 1):
+                if text1[i - 1] == text2[j - 1]:
+                    g[j] = 1 + f[j - 1]
+                else:
+                    g[j] = max(f[j], g[j - 1])
+            f = g
+        return g[n]
+```
+
+### [10. Regular Expression Matching](https://leetcode.cn/problems/regular-expression-matching/)
+
+```python
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        m = len(s)
+        n = len(p)
+        dp = [[False] * (n+1) for _ in range(m+1)]
+        dp[m][n] = True
+
+        # p = a*.*.*
+        for j in range(n - 1, -1, -1):
+            dp[m][j] = j + 1 < n and p[j + 1] == '*' and dp[m][j + 2]
+        
+        def matchRegChar(x, y ):
+            return x == y or x == '.' or y == '.'
+  
+        for i in range(m - 1, -1, -1):
+            for j in range(n - 1, -1, -1):
+                if p[j] == '*':
+                    continue
+                if j + 1 >= n or p[j + 1] != '*': 
+                    dp[i][j] = dp[i + 1][j + 1] and matchRegChar(s[i], p[j])
+                else:
+                    # 下一个是 *
+                    # use once, reuse, not use
+                    if matchRegChar(s[i], p[j]):
+                        dp[i][j] = dp[i + 1][j + 2] or dp[i + 1][j]
+                    dp[i][j] = dp[i][j] or dp[i][j + 2]
+        return dp[0][0]
+```
+
+### [97. Interleaving String](https://leetcode.cn/problems/interleaving-string/)
+
+s1 s2是否能交错组成s3
+
+```python
+class Solution:
+    def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
+        if len(s1) + len(s2) != len(s3):
+            return False
+        # [已经匹配的] (最后一个元素 要么来自s1, 要么来自s2)
+        # f[s1的前i个元素][f2的前j个元素] 是否能match s3 的前i+j-1个元素
+        # = f[i-1][j] & s1[i-1] == s3[i+j-1] 
+        #   or f[i][j-1] & s2[j-1] == s3[i+j-1]
+        f = [False] * (len(s2) + 1)
+        f[0] = True
+        for idx, ch in enumerate(s2):
+            f[idx + 1] = f[idx] and idx < len(s3) and s2[idx] == s3[idx]
+        
+        for i in range(1, len(s1) + 1):
+            g = [False] * (len(s2) + 1)
+            g[0] = f[0] and i - 1 < len(s3) and s1[i - 1] == s3[i - 1]
+            for j in range(1, len(s2) + 1):
+                g[j] = f[j] and i + j - 1 < len(s3) and s1[i - 1] == s3[i + j - 1]
+                g[j] = g[j] or g[j - 1] and i + j - 1 < len(s3) and s2[j - 1] == s3[i + j - 1]
+            f = g
+        return f[len(s2)]
+```
+
+### [87. Scramble String](https://leetcode.cn/problems/scramble-string/)
+
+匹配两个字符串：找一个位置切开，切开后可以左右互换
+
+```python
+class Solution:
+    def isScramble(self, s1: str, s2: str) -> bool:
+        if len(s1) != len(s2):
+            return False
+        @cache
+        def dfs(idx1, idx2, length):
+            if s1[idx1: idx1 + length] == s2[idx2: idx2 + length]:
+                return True
+            if Counter(s1[idx1: idx1 + length]) != Counter(s2[idx2: idx2 + length]):
+                return False
+            for leftLen in range(1, length):
+                rightLen = length - leftLen
+                # no swap
+                if dfs(idx1, idx2, leftLen) and dfs(idx1 + leftLen, idx2 + leftLen, length - leftLen):
+                    return True
+                # swap
+                if dfs(idx1, idx2 + length - leftLen, leftLen) and dfs(idx1 + leftLen, idx2, rightLen):
+                    return True
+            return False
+        ans = dfs(0, 0, len(s1))
+        dfs.cache_clear()
+        return ans
+```
+
+## 矩阵
