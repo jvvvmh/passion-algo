@@ -1061,3 +1061,23 @@ class Solution:
 ```
 
 ## 矩阵
+
+### [174. Dungeon Game](https://leetcode.cn/problems/dungeon-game/)
+
+The knight has an initial health point represented by a positive integer. If at any point his health point drops to `0` or below, he dies immediately. Return *the knight's minimum initial health so that he can rescue the princess*.
+
+```python
+class Solution:
+    def calculateMinimumHP(self, dungeon: List[List[int]]) -> int:
+        m, n = len(dungeon), len(dungeon[0])
+        # f[i][j]表示从这个点出发达到终点，至少需要多少initial health
+        f = [float('inf')] * n
+        f[-1] = 1
+        for i in range(m - 1, -1, -1):
+            g = [0] * n
+            for j in range(n - 1, -1, -1):
+                g[j] = max(min(f[j], g[j + 1] if j + 1 < n else float('inf')) - dungeon[i][j], 1)
+            f = g
+        return f[0]
+```
+
