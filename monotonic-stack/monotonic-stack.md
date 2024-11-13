@@ -6,7 +6,7 @@
 
 ### [42. Trapping Rain Water](https://leetcode.cn/problems/trapping-rain-water/)
 
-<img src="images/rain.png" alt="rain water" style="zoom:33%;" />
+<img src="images/rain.PNG" alt="rain water" style="zoom:33%;" />
 
 ```python
 # 记录左右（包括自己的）最大值
