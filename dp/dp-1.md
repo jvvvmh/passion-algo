@@ -1081,3 +1081,26 @@ class Solution:
         return f[0]
 ```
 
+### [221. Maximal Square](https://leetcode.cn/problems/maximal-square/)
+
+0, 1矩阵，求最大正方形面积
+
+```python
+class Solution:
+    def maximalSquare(self, matrix: List[List[str]]) -> int:
+        m, n = len(matrix), len(matrix[0])
+        dp = [[0] * n for _ in range(m)]
+        ans = 0
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == '0':
+                    continue
+                dp[i][j] = min([
+                    dp[i - 1][j - 1] if i > 0 and j > 0 else 0,
+                    dp[i][j - 1] if j > 0 else 0,
+                    dp[i - 1][j] if i > 0 else 0
+                ]) + 1
+                ans = max(ans, dp[i][j])
+        return ans * ans
+```
+
