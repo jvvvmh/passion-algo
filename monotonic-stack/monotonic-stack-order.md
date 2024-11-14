@@ -1,8 +1,6 @@
-# 栈
+# 单调栈 - 序
 
 [TOC]
-
-## 单调栈
 
 ### [42. Trapping Rain Water](https://leetcode.cn/problems/trapping-rain-water/)
 
