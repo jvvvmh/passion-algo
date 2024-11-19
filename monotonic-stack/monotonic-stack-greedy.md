@@ -180,3 +180,50 @@ class Solution:
         
         return s
 ```
+
+### [456. 132 Pattern](https://leetcode.cn/problems/132-pattern/)
+
+```
+from sortedcontainers import SortedList
+
+class Solution:
+    def find132pattern(self, nums: List[int]) -> bool:
+
+        # O(n), max_k is a valid "2"
+        n = len(nums)
+        candidate_k = [nums[n - 1]]
+        max_k = float("-inf")
+
+        for i in range(n - 2, -1, -1):
+            if nums[i] < max_k:
+                return True
+            while candidate_k and nums[i] > candidate_k[-1]:
+                max_k = candidate_k[-1]
+                candidate_k.pop()
+            if nums[i] > max_k: # > max_k 但是 <= last candidate
+                                # candidate 是 单调递减的
+                candidate_k.append(nums[i])
+        return False
+
+ 
+        # multiset or SortedList nlog(n)
+        if len(nums) < 3:
+            return False
+        leftMin = [nums[0]]
+        for x in nums[1:]:
+            leftMin.append(min(leftMin[-1], x))
+
+        rightAll = SortedList(nums[-1:])
+        for i in range(len(nums) - 2, 0, -1):
+            if leftMin[i] < nums[i]:
+                index = rightAll.bisect_right(leftMin[i])
+                if index < len(rightAll) and rightAll[index] < nums[i]:
+                    return True
+            rightAll.add(nums[i])
+        return False
+
+        
+
+
+```
+
