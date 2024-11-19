@@ -132,3 +132,51 @@ class Solution:
 
 
 
+### [402. Remove K Digits](https://leetcode.cn/problems/remove-k-digits/)
+
+Given string num representing a non-negative integer `num`, and an integer `k`, return *the smallest possible integer after removing* `k` *digits from* `num`.
+
+**Example 1:**
+
+```
+Input: num = "1432219", k = 3
+Output: "1219"
+Explanation: Remove the three digits 4, 3, and 2 to form the new number 1219 which is the smallest.
+```
+
+**Example 2:**
+
+```
+Input: num = "10200", k = 1
+Output: "200"
+Explanation: Remove the leading 1 and the number is 200. Note that the output must not contain leading zeroes.
+```
+
+```python
+class Solution:
+    def removeKdigits(self, num: str, k: int) -> str:
+        # 2 2 3
+        s = ""
+        for ch in num:
+            if not s or ch >= s[-1]:
+                s += ch
+            else:
+                while s and ch < s[-1] and k > 0:
+                    s = s[:-1]
+                    k -= 1
+                s += ch
+                if len(s) == 1 and ch == '0':
+                    s = ""
+        if k >= len(s):
+            s = ""
+        elif k > 0:
+            s = s[:-k]
+        
+        while s and s[0] == '0':
+            s = s[1:]
+        
+        if len(s) == 0:
+            s = '0'
+        
+        return s
+```
