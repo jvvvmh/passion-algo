@@ -183,7 +183,7 @@ class Solution:
 
 ### [456. 132 Pattern](https://leetcode.cn/problems/132-pattern/)
 
-```
+```python
 from sortedcontainers import SortedList
 
 class Solution:
@@ -222,9 +222,7 @@ class Solution:
             rightAll.add(nums[i])
         return False
 
-        
-
-
+ 
 ```
 
 ### [503. Next Greater Element II](https://leetcode.cn/problems/next-greater-element-ii/)
@@ -248,5 +246,38 @@ public:
         return res;
     }
 };
+```
+
+[581. Shortest Unsorted Continuous Subarray](https://leetcode.cn/problems/shortest-unsorted-continuous-subarray/)
+
+Given an integer array `nums`, you need to find one **continuous subarray** such that if you only sort this subarray in non-decreasing order, then the whole array will be sorted in non-decreasing order.
+
+**Example 1:**
+
+```
+Input: nums = [2,6,4,8,10,9,15]
+Output: 5
+Explanation: You need to sort [6, 4, 8, 10, 9] in ascending order to make the whole array sorted in ascending order.
+```
+
+```python
+class Solution:
+    def findUnsortedSubarray(self, nums: List[int]) -> int:
+        n = len(nums)
+        maxn, right = float("-inf"), -1
+        minn, left = float("inf"), -1
+
+        for i in range(n):
+            if maxn > nums[i]:
+                right = i
+            else:
+                maxn = nums[i]
+            
+            if minn < nums[n - i - 1]:
+                left = n - i - 1
+            else:
+                minn = nums[n - i - 1]
+        
+        return 0 if right == -1 else right - left + 1
 ```
 
