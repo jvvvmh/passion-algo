@@ -227,3 +227,26 @@ class Solution:
 
 ```
 
+### [503. Next Greater Element II](https://leetcode.cn/problems/next-greater-element-ii/)
+
+循环数组中，下一个大于自己的数字
+
+```c++
+class Solution {
+public:
+    vector<int> nextGreaterElements(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> res(n, -1);
+        stack<int> s;
+        for (int i = 0; i < n * 2 - 1; ++i) {
+            while (!s.empty() && nums[s.top()] < nums[i % n]) {
+                res[s.top()] = nums[i % n];
+                s.pop();
+            }
+            s.push(i % n);
+        }
+        return res;
+    }
+};
+```
+
