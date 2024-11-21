@@ -51,7 +51,7 @@ array of distinct numbers. 取最大的作为root，把数组一分为二，然�
 2. 自己被visit的时候，比自己大的都visit过了。从方法1来看，左边最近的比自己大的，右边最近的比自己大的，较小者是自己的父节点（反证法）。但是需要存left/right数组。
 3. 在栈上动态更新：维护一个单调递减，pop 左边比自己小的，我指向它。栈中左边比自己大的再指向自己。如果后来来了一个比自己大的，那么，它pop我，我指向它；我的栈中左边指向它。
 
-<img src="C:\Users\jvmh\Desktop\MSCS\算法\passion-algo\monotonic-stack\images\max-tree.PNG" alt="tree" style="zoom: 50%;" >
+<img src="images\max-tree.PNG" alt="tree" style="zoom: 50%;" >
 
 ```python
 # Definition for a binary tree node.
