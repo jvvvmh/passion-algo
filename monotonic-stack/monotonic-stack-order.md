@@ -107,5 +107,67 @@ class Solution:
         return ans
 ```
 
+### [503. Next Greater Element II](https://leetcode.cn/problems/next-greater-element-ii/)
+
+循环数组中，下一个大于自己的数字
+
+```c++
+class Solution {
+public:
+    vector<int> nextGreaterElements(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> res(n, -1);
+        stack<int> s;
+        for (int i = 0; i < n * 2 - 1; ++i) {
+            while (!s.empty() && nums[s.top()] < nums[i % n]) {
+                res[s.top()] = nums[i % n];
+                s.pop();
+            }
+            s.push(i % n);
+        }
+        return res;
+    }
+};
+```
+
+### [581. Shortest Unsorted Continuous Subarray](https://leetcode.cn/problems/shortest-unsorted-continuous-subarray/)
+
+Given an integer array `nums`, you need to find one **continuous subarray** such that if you only sort this subarray in non-decreasing order, then the whole array will be sorted in non-decreasing order.
+
+**Example 1:**
+
+```
+Input: nums = [2,6,4,8,10,9,15]
+Output: 5
+Explanation: You need to sort [6, 4, 8, 10, 9] in ascending order to make the whole array sorted in ascending order.
+```
+
+```python
+class Solution:
+    def findUnsortedSubarray(self, nums: List[int]) -> int:
+        # leftmost time to break inc
+        # i.e. exists a number right to me but smaller than me
+        # i.e. < rightMin
+        leftIdx = -1
+        rMin = float('inf')
+        for i in range(len(nums) - 1, -1, -1):
+            if nums[i] > rMin:
+                leftIdx = i
+            else:
+                rMin = nums[i]
+        if leftIdx == -1:
+            return 0
+        # rightmost time to break inc
+        # i.e. me < leftMax
+        rightIdx = -1
+        leftMax = float('-inf')
+        for i in range(len(nums)):
+            if nums[i] < leftMax:
+                rightIdx = i
+            else:
+                leftMax = nums[i]
+        return rightIdx - leftIdx + 1
+```
+
 
 

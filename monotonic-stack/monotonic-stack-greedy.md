@@ -248,7 +248,7 @@ public:
 };
 ```
 
-[581. Shortest Unsorted Continuous Subarray](https://leetcode.cn/problems/shortest-unsorted-continuous-subarray/)
+### [581. Shortest Unsorted Continuous Subarray](https://leetcode.cn/problems/shortest-unsorted-continuous-subarray/)
 
 Given an integer array `nums`, you need to find one **continuous subarray** such that if you only sort this subarray in non-decreasing order, then the whole array will be sorted in non-decreasing order.
 
@@ -285,5 +285,38 @@ class Solution:
             else:
                 leftMax = nums[i]
         return rightIdx - leftIdx + 1
+```
+
+### [654. Maximum Binary Tree](https://leetcode.cn/problems/maximum-binary-tree/)
+
+array of distinct numbers. 取最大的作为root，把数组一分为二，然后左右数组recursive
+
+1. BFS 最差情况数组单调，分割 O(N)，组内寻找最大 O(N)
+
+2. 自己被visit的时候，比自己大的都visit过了。从方法1来看，左边最近的比自己大的，右边最近的比自己大的，较小者是自己的父节点（反证法）。但是需要存left/right数组。
+3. 在栈上动态更新：维护一个单调递减，pop 左边比自己小的，我指向它。栈中左边比自己大的再指向自己。如果后来来了一个比自己大的，那么，它pop我，我指向它；我的栈中左边指向它。
+
+<img src="images\max-tree.PNG" alt="tree" style="zoom: 50%;" >
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def constructMaximumBinaryTree(self, nums: List[int]) -> Optional[TreeNode]:
+        # 5 [4] 2 1 (3)
+        s = []
+        nodes = [TreeNode(val=num) for num in nums]
+        for i, num in enumerate(nums):
+            while s and num > nums[s[-1]]:
+                idx = s.pop()
+                nodes[i].left = nodes[idx]
+            if s:
+                nodes[s[-1]].right = nodes[i]
+            s.append(i)
+        return nodes[s[0]]
 ```
 
