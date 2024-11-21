@@ -263,21 +263,27 @@ Explanation: You need to sort [6, 4, 8, 10, 9] in ascending order to make the wh
 ```python
 class Solution:
     def findUnsortedSubarray(self, nums: List[int]) -> int:
-        n = len(nums)
-        maxn, right = float("-inf"), -1
-        minn, left = float("inf"), -1
-
-        for i in range(n):
-            if maxn > nums[i]:
-                right = i
+        # leftmost time to break inc
+        # i.e. exists a number right to me but smaller than me
+        # i.e. < rightMin
+        leftIdx = -1
+        rMin = float('inf')
+        for i in range(len(nums) - 1, -1, -1):
+            if nums[i] > rMin:
+                leftIdx = i
             else:
-                maxn = nums[i]
-            
-            if minn < nums[n - i - 1]:
-                left = n - i - 1
+                rMin = nums[i]
+        if leftIdx == -1:
+            return 0
+        # rightmost time to break inc
+        # i.e. me < leftMax
+        rightIdx = -1
+        leftMax = float('-inf')
+        for i in range(len(nums)):
+            if nums[i] < leftMax:
+                rightIdx = i
             else:
-                minn = nums[n - i - 1]
-        
-        return 0 if right == -1 else right - left + 1
+                leftMax = nums[i]
+        return rightIdx - leftIdx + 1
 ```
 
