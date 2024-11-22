@@ -188,7 +188,7 @@ class Solution {
 public:
     int maxChunksToSorted(vector<int>& arr) {
         // 2 1 3 9 10 8 
-        // (1 2) 3 (8, 9, 10)
+        // (1 2) 3 (8, 9, 10)  来一个，如果逆序了，就把最后几个缩点。
         stack<int> s;
         for (auto& x: arr) {
             if (s.empty() || x >= s.top()) {
@@ -206,3 +206,86 @@ public:
 };
 ```
 
+
+
+### [853. Car Fleet](https://leetcode.cn/problems/car-fleet/)
+
+后面的车，如果追上了前面的车，就会和前面的车一样慢。问到达target前形成多少车队。
+
+- 后面的车如果T <= 前一辆车，不考虑其他车的情况下，一定能缩点
+  - 相遇前，后面的车不会比自己慢，但前面的车可能因为和更前面的车缩点而更慢
+  - 所以一定会相遇
+- T 单调下降则不会缩点
+
+```python
+class Solution:
+    def carFleet(self, target: int, position: List[int], speed: List[int]) -> int:
+        # T: 5 4 3 2 1
+        # T: 3 4 5 2 1
+        posSpeedList = sorted(zip(position, speed))
+        T = [(target - pos) / v for (pos, v) in posSpeedList]
+        s = []
+        for t in T:
+            while (s and t >= s[-1]):
+                s.pop()
+            s.append(t)
+        return len(s)
+```
+
+### [901. Online Stock Span](https://leetcode.cn/problems/online-stock-span/)
+
+今天前连续<=今天价格的天数。单调递增栈，但是要维护每个团的size。
+
+**Example 1:**
+
+```
+Input
+["StockSpanner", "next", "next", "next", "next", "next", "next", "next"]
+[[], [100], [80], [60], [70], [60], [75], [85]]
+Output
+[null, 1, 1, 1, 2, 1, 4, 6]
+
+Explanation
+StockSpanner stockSpanner = new StockSpanner();
+stockSpanner.next(100); // return 1
+stockSpanner.next(80);  // return 1
+stockSpanner.next(60);  // return 1
+stockSpanner.next(70);  // return 2 把60合并了，但是只记录70
+stockSpanner.next(60);  // return 1
+stockSpanner.next(75);  // return 4, because the last 4 prices (including today's price of 75) were less than or equal to today's price.
+stockSpanner.next(85);  // return 6
+```
+
+```python
+class StockSpanner:
+
+    def __init__(self):
+        self.s = []
+
+    def next(self, price: int) -> int:
+        s = self.s
+        cnt = 1
+        while (s and price >= s[-1][0]):
+            _, n = s.pop()
+            cnt += n
+        s.append((price, cnt))
+        return cnt
+```
+
+或者记录 idx 
+
+```python
+class StockSpanner:
+
+    def __init__(self):
+        self.s = [(-1, float('inf'))]
+        self.idx = -1
+    def next(self, price: int) -> int:
+        s = self.s
+        while (s and price >= s[-1][1]):
+            s.pop()
+        self.idx += 1
+        ans = self.idx - s[-1][0]
+        s.append((self.idx, price))
+        return ans
+```
