@@ -171,3 +171,38 @@ class Solution:
 
 
 
+### [768. Max Chunks To Make Sorted II](https://leetcode.cn/problems/max-chunks-to-make-sorted-ii/)
+
+**Example 2:**
+
+```
+Input: arr = [2,1,3,4,4]
+Output: 4
+Explanation:
+We can split into two chunks, such as [2, 1], [3, 4, 4].
+However, splitting into [2, 1], [3], [4], [4] is the highest number of chunks possible.
+```
+
+```c++
+class Solution {
+public:
+    int maxChunksToSorted(vector<int>& arr) {
+        // 2 1 3 9 10 8 
+        // (1 2) 3 (8, 9, 10)
+        stack<int> s;
+        for (auto& x: arr) {
+            if (s.empty() || x >= s.top()) {
+                s.push(x);
+                continue;
+            }
+            int head = s.top();
+            while (!s.empty() && x < s.top()) {
+                s.pop();
+            }
+            s.push(head);
+        }
+        return s.size();
+     }
+};
+```
+
