@@ -289,3 +289,42 @@ class StockSpanner:
         s.append((self.idx, price))
         return ans
 ```
+
+### [907. Sum of Subarray Minimums](https://leetcode.cn/problems/sum-of-subarray-minimums/)
+
+**Example 1:**
+
+```
+Input: arr = [3,1,2,4]
+Output: 17
+Explanation: 
+Subarrays are [3], [1], [2], [4], [3,1], [1,2], [2,4], [3,1,2], [1,2,4], [3,1,2,4]. 
+Minimums are 3, 1, 2, 4, 1, 1, 2, 1, 1, 1.
+Sum is 17.
+```
+
+```python
+class Solution:
+    def sumSubarrayMins(self, arr: List[int]) -> int:
+        # 4 3 1 2 2
+        #    [    ]
+        #    [      ]
+        s = []
+        n = len(arr)
+        left = [-1] * n
+        right = [n] * n
+        for i, num in enumerate(arr):
+            while len(s) and num <= arr[s[-1]]:
+                idx = s.pop()
+                right[idx] = i
+            left[i] = s[-1] if s else -1
+            s.append(i)
+ 
+        ans = 0
+        m = 10 ** 9 + 7
+        for i in range(n):
+            ans += (right[i] - i) * (i - left[i]) * arr[i]
+            ans %= m
+        return ans
+```
+
