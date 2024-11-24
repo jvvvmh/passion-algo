@@ -94,5 +94,39 @@ class Solution:
         return nodes[0]
 ```
 
+### [1130. Minimum Cost Tree From Leaf Values](https://leetcode.cn/problems/minimum-cost-tree-from-leaf-values/)
 
+<img src="images\tree-merge-cost.PNG" alt="tree" style="zoom: 50%;" >
+
+合并cost是左右子树最大值的乘积。希望小的数字多合并几次。
+
+4 3 2 1 从右边开始合并
+
+1 2 3 4 从左边开始合并
+
+8 5 (2 1) 6 -> 8 5 2 6 -> 8 5 6 -> 8 6
+
+4 2 3 合并 2, 3 -> 2, 3
+
+```python
+class Solution:
+    def mctFromLeafValues(self, arr: List[int]) -> int:
+        ans = 0
+        s = []
+        for x in arr:
+            while s and x >= s[-1]:
+                y = s.pop()
+                if not s or s[-1] > x: # 和自己合并, 新 value 是自己
+                    ans += y * x
+                    break
+                else:
+                    ans += s[-1] * y # 和栈中元素合并, 新 value 是栈中元素，还在栈中
+            # 栈中元素已经比自己严格大了
+            s.append(x)
+        # s 中元素单调递减, 从后面开始 4 3 2 1
+        while len(s) >= 2:
+            x = s.pop()
+            ans += s[-1] * x
+        return ans
+```
 
