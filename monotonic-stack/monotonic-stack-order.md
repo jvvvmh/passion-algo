@@ -328,3 +328,43 @@ class Solution:
         return ans
 ```
 
+
+
+
+
+### [975. Odd Even Jump](https://leetcode.cn/problems/odd-even-jump/)　排序后的单调栈
+
+左跳右边 比自己大中最小的
+
+考虑单调上升的数字，但是索引却单调递减，他们在等待下一个数字可以pop他们
+
+```python
+class Solution:
+    def oddEvenJumps(self, arr: List[int]) -> int:
+        n = len(arr)
+
+        incIdx = sorted(range(n), key=lambda i: (arr[i], i))
+        oddNext = [i for i in range(n)]
+        s = [] # 索引单调递减
+        for i in incIdx:
+            while s and i > s[-1]:
+                oddNext[s.pop()] = i
+            s.append(i)
+        
+        decIdx = sorted(range(n), key=lambda i: (-arr[i], i))
+        evenNext = [i for i in range(n)]
+        s = [] # 索引单调递减
+        for i in decIdx:
+            while s and i > s[-1]:
+                evenNext[s.pop()] = i
+            s.append(i)
+        print(oddNext)
+        print(evenNext)
+
+        evenReach = [False] * (n - 1) + [True]
+        oddReach = [False] * (n - 1) + [True]
+        for i in range(n - 2, -1, -1):
+            evenReach[i], oddReach[i] = oddReach[evenNext[i]], evenReach[oddNext[i]]
+        return sum(oddReach)
+```
+
