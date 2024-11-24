@@ -259,3 +259,39 @@ class Solution:
         return res
 ```
 
+### [1081. Smallest Subsequence of Distinct Characters](https://leetcode.cn/problems/smallest-subsequence-of-distinct-characters/)
+
+**Example 1:**
+
+```
+Input: s = "bcabc"
+Output: "abc"
+```
+
+```python
+class Solution:
+    def smallestSubsequence(self, s: str) -> str:
+        c = Counter(s)
+        visited = set()
+        ans = ""
+        for ch in s:
+            c[ch] -= 1
+            if not ans:
+                ans += ch
+                visited.add(ch)
+                continue
+            if ch in visited:
+                continue
+            if ch > ans[-1]:
+                ans += ch
+                visited.add(ch)
+            else:
+                while ans and ch < ans[-1] and c[ans[-1]] > 0:
+                    tmp = ans[-1]
+                    ans = ans[:-1]
+                    visited.remove(tmp)
+                visited.add(ch)
+                ans += ch
+        return ans
+```
+
