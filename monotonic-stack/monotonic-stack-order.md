@@ -368,3 +368,51 @@ class Solution:
         return sum(oddReach)
 ```
 
+
+
+[1124. Longest Well-Performing Interval](https://leetcode.cn/problems/longest-well-performing-interval/)
+
+a *tiring day* if and only if the number of hours worked is (strictly) greater than `8`.
+
+A *well-performing interval* is an interval of days for which the number of tiring days > number of non-tiring days.
+
+Return the length of the longest well-performing interval.
+
+**Example 1:**
+
+```
+Input: hours = [9,9,6,0,6,6,9]
+Output: 3
+Explanation: The longest well-performing interval is [9,9,6].
+```
+
+```python
+class Solution:
+    def longestWPI(self, hours: List[int]) -> int:
+        # 9 9 6 0 6 6 9
+        # +1 +1 -1 -1 -1 -1 +1
+        # 求最长的子数组，使得和 > 0
+        # 那么记录前缀和s，要s[j] - s[i] > 0，找最远的i, j距离
+        # 给定j，要i最远
+        # 如果栈单调递减，来了一个j，那么pop出了它的i
+        # 但是这些 i 还有用，还需要放回这个单调递减的栈。。。
+        # 所以原始的pop只能解决最近的i, j距离
+
+        # 思路回到寻找最长的一段i, j 使得 x[i] < x[j]
+        # 只需要记录 原数组左边开始 单调递减的子序列，然后从右边开始不停pop它
+        hours = [1 if x > 8 else -1 for x in hours]
+        cumsum = [0] * (len(hours) + 1)
+        for i in range(1, len(hours) + 1):
+            cumsum[i] = cumsum[i - 1] + hours[i - 1]
+ 
+        s = [0] # 左侧单调递减子序列 的坐标
+        for i in range(1, len(cumsum)):
+            if cumsum[i] < cumsum[s[-1]]:
+                s.append(i)
+        ans = 0
+        for j in range(len(cumsum) - 1, -1, -1):
+            while s and cumsum[j] > cumsum[s[-1]]:
+                ans = max(ans, j - s.pop())
+        return ans
+```
+
