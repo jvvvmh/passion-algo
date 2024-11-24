@@ -75,10 +75,23 @@ class Solution:
         return nodes[s[0]]
 ```
 
-
+### [1008. Construct Binary Search Tree from Preorder Traversal](https://leetcode.cn/problems/construct-binary-search-tree-from-preorder-traversal/)
 
 ```python
-
+class Solution:
+    def bstFromPreorder(self, preorder: List[int]) -> Optional[TreeNode]:
+        nodes = [TreeNode(num) for i, num in enumerate(preorder)]
+        s = [0]
+        for i in range(1, len(preorder)):
+            if s and preorder[i] < preorder[s[-1]]:
+                nodes[s[-1]].left = nodes[i]
+            rootIdx = -1
+            while s and preorder[i] > preorder[s[-1]]:
+                rootIdx = s.pop()
+            if rootIdx != -1:
+                nodes[rootIdx].right = nodes[i]
+            s.append(i)
+        return nodes[0]
 ```
 
 
