@@ -225,98 +225,37 @@ class Solution:
  
 ```
 
-### [503. Next Greater Element II](https://leetcode.cn/problems/next-greater-element-ii/)
+### [962. Maximum Width Ramp](https://leetcode.cn/problems/maximum-width-ramp/)
 
-循环数组中，下一个大于自己的数字
+A **ramp** in an integer array `nums` is a pair `(i, j)` for which `i < j` and `nums[i] <= nums[j]`. The **width** of such a ramp is `j - i`.
 
-```c++
-class Solution {
-public:
-    vector<int> nextGreaterElements(vector<int>& nums) {
-        int n = nums.size();
-        vector<int> res(n, -1);
-        stack<int> s;
-        for (int i = 0; i < n * 2 - 1; ++i) {
-            while (!s.empty() && nums[s.top()] < nums[i % n]) {
-                res[s.top()] = nums[i % n];
-                s.pop();
-            }
-            s.push(i % n);
-        }
-        return res;
-    }
-};
-```
-
-### [581. Shortest Unsorted Continuous Subarray](https://leetcode.cn/problems/shortest-unsorted-continuous-subarray/)
-
-Given an integer array `nums`, you need to find one **continuous subarray** such that if you only sort this subarray in non-decreasing order, then the whole array will be sorted in non-decreasing order.
-
-**Example 1:**
-
-```
-Input: nums = [2,6,4,8,10,9,15]
-Output: 5
-Explanation: You need to sort [6, 4, 8, 10, 9] in ascending order to make the whole array sorted in ascending order.
-```
+Given an integer array `nums`, return *the maximum width of a **ramp** in* `nums`.
 
 ```python
 class Solution:
-    def findUnsortedSubarray(self, nums: List[int]) -> int:
-        # leftmost time to break inc
-        # i.e. exists a number right to me but smaller than me
-        # i.e. < rightMin
-        leftIdx = -1
-        rMin = float('inf')
+    def maxWidthRamp(self, nums: List[int]) -> int:
+        # 排序: 之前最小idx和自己
+        # arr = [(x, i) for i, x in enumerate(nums)]
+        # arr = sorted(arr)
+        prevMinIdx = float('inf')
+        res = 0
+        n = len(nums)
+        for currIdx in sorted(range(n), key=nums.__getitem__):
+            res = max(res, currIdx - prevMinIdx)
+            prevMinIdx = min(prevMinIdx, currIdx)
+        return res
+
+        # 单调递减栈 (左边可能的)
+        # 从右边开始，pop这个栈
+        s = [0]
+        for i in range(1, len(nums)):
+            if nums[i] < nums[s[-1]]:
+                s.append(i)
+        res = 0
         for i in range(len(nums) - 1, -1, -1):
-            if nums[i] > rMin:
-                leftIdx = i
-            else:
-                rMin = nums[i]
-        if leftIdx == -1:
-            return 0
-        # rightmost time to break inc
-        # i.e. me < leftMax
-        rightIdx = -1
-        leftMax = float('-inf')
-        for i in range(len(nums)):
-            if nums[i] < leftMax:
-                rightIdx = i
-            else:
-                leftMax = nums[i]
-        return rightIdx - leftIdx + 1
-```
-
-### [654. Maximum Binary Tree](https://leetcode.cn/problems/maximum-binary-tree/)
-
-array of distinct numbers. 取最大的作为root，把数组一分为二，然后左右数组recursive
-
-1. BFS 最差情况数组单调，分割 O(N)，组内寻找最大 O(N)
-
-2. 自己被visit的时候，比自己大的都visit过了。从方法1来看，左边最近的比自己大的，右边最近的比自己大的，较小者是自己的父节点（反证法）。但是需要存left/right数组。
-3. 在栈上动态更新：维护一个单调递减，pop 左边比自己小的，我指向它。栈中左边比自己大的再指向自己。如果后来来了一个比自己大的，那么，它pop我，我指向它；我的栈中左边指向它。
-
-<img src="images\max-tree.PNG" alt="tree" style="zoom: 50%;" >
-
-```python
-# Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
-class Solution:
-    def constructMaximumBinaryTree(self, nums: List[int]) -> Optional[TreeNode]:
-        # 5 [4] 2 1 (3)
-        s = []
-        nodes = [TreeNode(val=num) for num in nums]
-        for i, num in enumerate(nums):
-            while s and num > nums[s[-1]]:
+            while (s and i >= s[-1] and nums[i] >= nums[s[-1]]):
                 idx = s.pop()
-                nodes[i].left = nodes[idx]
-            if s:
-                nodes[s[-1]].right = nodes[i]
-            s.append(i)
-        return nodes[s[0]]
+                res = max(res, i - idx)
+        return res
 ```
 
