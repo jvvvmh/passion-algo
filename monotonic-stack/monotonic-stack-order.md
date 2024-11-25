@@ -370,7 +370,7 @@ class Solution:
 
 
 
-[1124. Longest Well-Performing Interval](https://leetcode.cn/problems/longest-well-performing-interval/)
+### [1124. Longest Well-Performing Interval](https://leetcode.cn/problems/longest-well-performing-interval/)
 
 a *tiring day* if and only if the number of hours worked is (strictly) greater than `8`.
 
@@ -414,5 +414,41 @@ class Solution:
             while s and cumsum[j] > cumsum[s[-1]]:
                 ans = max(ans, j - s.pop())
         return ans
+```
+
+[1574. Shortest Subarray to be Removed to Make Array Sorted](https://leetcode.cn/problems/shortest-subarray-to-be-removed-to-make-array-sorted/)
+
+Given an integer array `arr`, remove a subarray (can be empty) from `arr` such that the remaining elements in `arr` are **non-decreasing**.
+
+Return *the length of the shortest subarray to remove*.
+
+**Example 1:**
+
+```
+Input: arr = [1,2,3,(10,4,2),3,5]
+Output: 3
+Explanation: The shortest subarray we can remove is [10,4,2] of length 3. The remaining elements after that will be [1,2,3,3,5] which are sorted.
+Another correct solution is to remove the subarray [3,10,4].
+```
+
+```python
+class Solution:
+    def findLengthOfShortestSubarray(self, arr: List[int]) -> int:
+        n = len(arr)
+        p1 = 0
+        while p1 + 1 < n and arr[p1 + 1] >= arr[p1]:
+            p1 += 1
+        # [   p1] [delete] [j...]
+        res = n - (p1 + 1) # 初始，右侧数组不存在，只保留 [0...p1]
+        for p2 in range(n - 1, -1, -1):
+            if p2 == p1:
+                break
+            while p1 >= 0 and arr[p1] > arr[p2]:
+                p1 -= 1
+            res = min(res, p2 - p1 - 1)
+            if p2 - 1 >= 0 and arr[p2 - 1] > arr[p2]:
+                break
+        return res
+
 ```
 

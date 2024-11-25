@@ -295,3 +295,62 @@ class Solution:
         return ans
 ```
 
+### [1504. Count Submatrices With All Ones](https://leetcode.cn/problems/count-submatrices-with-all-ones/) 矩形
+
+以[i,j]为右下角的全1矩形有多少个呢?
+
+固定列j, row[i]表示左侧连续1的个数
+
+```python
+class Solution:
+    def numSubmat(self, mat: List[List[int]]) -> int:
+        m, n = len(mat), len(mat[0])
+        row = [0] * m
+        ans = 0
+        for j in range(n):
+            # update row
+            for i in range(m):
+                row[i] = row[i] + 1 if mat[i][j] else 0
+ 
+            # 单调递增栈:
+            s = [] # row expand, height
+            cumsum = 0 # num of additional matrices with this row as bottom
+            for i in range(m):
+                currHeight = 1
+                while s and row[i] <= s[-1][0]:
+                    rowExpand, height = s.pop()
+                    cumsum -= (rowExpand - row[i]) * height
+                    currHeight += height
+                cumsum += row[i] # !
+                ans += cumsum
+                s.append((row[i], currHeight))
+            
+        return ans
+```
+
+### [1526. Minimum Number of Increments on Subarrays to Form a Target Array](https://leetcode.cn/problems/minimum-number-of-increments-on-subarrays-to-form-a-target-array/)
+
+**Example 2:**
+
+```
+Input: target = [3,1,1,2]
+Output: 4
+Explanation: [0,0,0,0] -> [1,1,1,1] -> [1,1,1,2] -> [2,1,1,2] -> [3,1,1,2]
+```
+
+```python
+class Solution:
+    def minNumberOperations(self, target: List[int]) -> int:
+        s = [0]
+        ans = 0
+        for h in target:
+            if h > s[-1]:
+                ans += h - s[-1]
+                s.append(h)
+            else:
+                while h < s[-1]:
+                    s.pop()
+                s.append(h) 
+        return ans
+```
+
