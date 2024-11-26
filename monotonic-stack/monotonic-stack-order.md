@@ -452,3 +452,47 @@ class Solution:
 
 ```
 
+### [1776. Car Fleet II](https://leetcode.cn/problems/car-fleet-ii/) (DP)
+
+车往右开。求每个车合并的时间。不合并返回-1
+
+```python
+class Solution:
+    def getCollisionTimes(self, cars: List[List[int]]) -> List[float]:
+        # 只要后面的人速度大，一定能追上前一个
+        # 但是追上的时候，前面那个车已经和之前的人合并了
+        # 那么相当于在追之前的人
+
+        # if v[2] < v[1], but 2 catches 1, 2 is actually catching the one before 1 who is very slow.
+
+        # only cares about an exact catch. i.e. dS / dV is Time
+
+        # start: car_n...car_1
+
+        # key: (1) if I cannot catch someone, the person behind me cannot either
+        #      (2) people behind me cannot change my speed.
+        ans = [-1] * n
+
+        def canExactCatch(i, j):
+            # can i catch j?
+            if cars[i][1] <= cars[j][1]:
+                return 0
+            t = (cars[j][0] - cars[i][0]) / (cars[i][1] - cars[j][1])
+            if ans[j] == -1:
+                return t
+            else:
+                if t < ans[j]:
+                    return t
+                else:
+                    return 0
+
+        s = [] # pop 不能追的人
+        for i in range(n - 1, -1, -1):
+            while s and not canExactCatch(i, s[-1]):
+                s.pop()
+            if s:
+                ans[i] = canExactCatch(i, s[-1])
+            s.append(i)
+
+        return ans
+```
