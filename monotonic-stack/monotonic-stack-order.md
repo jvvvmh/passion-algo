@@ -585,3 +585,32 @@ class Solution:
         return ans % m
 ```
 
+
+
+### [1944. Number of Visible People in a Queue](https://leetcode.cn/problems/number-of-visible-people-in-a-queue/)
+
+A person can **see** another person to their right in the queue if everybody in between is **shorter** than both of them.
+
+```
+Input: heights = [5,1,2,3,10]
+Output: [4,1,1,1,0]
+```
+
+```python
+class Solution:
+    def canSeePersonsCount(self, heights: List[int]) -> List[int]:
+        #    3 5 7 10 (无法看到再之前的人)
+        # 6 /  / 7 10 (被6pop的3和5反正被6挡住了, 不能被6左边的人看到)
+        n = len(heights)
+        ans = [0] * n
+        s = []
+        for i in range(n - 1, -1, -1):
+            while s and heights[i] > heights[s[-1]]:
+                s.pop()
+                ans[i] += 1
+            if s:
+                ans[i] += 1
+            s.append(i)
+        return ans
+```
+
