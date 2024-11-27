@@ -553,3 +553,35 @@ class Solution:
             
 ```
 
+### [1856. Maximum Subarray Min-Product](https://leetcode.cn/problems/maximum-subarray-min-product/)
+
+The **min-product** of an array is equal to the **minimum value** in the array **multiplied by** the array's **sum**.
+
+- For example, the array `[3,2,5]` (minimum value is `2`) has a min-product of `2 * (3+2+5) = 2 * 10 = 20`.
+
+```python
+class Solution:
+    def maxSumMinProduct(self, nums: List[int]) -> int:
+        # 右边比自己严格小 (-1)
+        # 左边比自己严格小 (n)
+        n = len(nums)
+        leftIdx = [-1] * n
+        rightIdx = [n] * n
+        s = []
+        for i, num in enumerate(nums):
+            while s and num < nums[s[-1]]:
+                rightIdx[s.pop()] = i # 右侧严格
+            if s:
+                leftIdx[i] = s[-1] # 左侧不严格
+            s.append(i)
+        s = []
+        cumsum = [0]
+        for i in range(n):
+            cumsum.append(cumsum[-1] + nums[i])
+        m = 10**9 + 7
+        ans = 0
+        for i in range(n):
+            ans = max(ans, (cumsum[rightIdx[i] - 1 + 1] - cumsum[leftIdx[i] + 1]) * nums[i])
+        return ans % m
+```
+
