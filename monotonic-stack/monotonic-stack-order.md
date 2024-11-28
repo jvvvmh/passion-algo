@@ -614,3 +614,47 @@ class Solution:
         return ans
 ```
 
+### [1950. Maximum of Minimum Values in All Subarrays](https://leetcode.cn/problems/maximum-of-minimum-values-in-all-subarrays/)
+
+You are given an integer array `nums` of size `n`. You are asked to solve `n` queries for each integer `i` in the range `0 <= i < n`.
+
+To solve the `ith` query:
+
+1. Find the **minimum value** in each possible subarray of size `i + 1` of the array `nums`.
+2. Find the **maximum** of those minimum values. This maximum is the **answer** to the query.
+
+Return *a **0-indexed** integer array* `ans` *of size* `n` *such that* `ans[i]` *is the answer to the* `ith` *query*.
+
+A **subarray** is a contiguous sequence of elements in an array.
+
+```python
+class Solution:
+    def findMaximums(self, nums: List[int]) -> List[int]:
+        # 1 (3 5) 2
+        # the right idx is determined when an element is popped
+        # left idx is just the element left to me (or -1)
+        # finally, 1 2 3 4 5, the right index is n
+        d = {} # length -> max of min
+        # 5 5 5 6 7     5:5 contains 4:5 3:5.... 1:5
+        #   5 5 6 7
+ 
+        # 0 1 1 2 大于等于就pop也没关系
+        n = len(nums)
+        s = [-1]
+        for i in range(n):
+            while len(s) > 1 and nums[i] <= nums[s[-1]]:
+                head = s.pop()
+                cnt = i - s[-1] - 1
+                d[cnt] = max(d.get(cnt, -1), nums[head])
+            s.append(i)
+        
+        for j in range(len(s) - 1, 0, -1):
+            cnt = n - s[j - 1] - 1
+            d[cnt] = max(d.get(cnt, -1), nums[s[j]])
+        
+        ans = [0] * n
+        ans[n - 1] = d[n]
+        for i in range(n - 2, -1, -1):
+            ans[i] = max(ans[i + 1], d.get(i + 1, -1))
+        return ans
+```
