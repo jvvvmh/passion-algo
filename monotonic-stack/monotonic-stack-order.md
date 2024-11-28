@@ -721,3 +721,52 @@ public:
 };
 ```
 
+
+
+### [2104. Sum of Subarray Ranges](https://leetcode.cn/problems/sum-of-subarray-ranges/)
+
+The **range** of a subarray is the difference between the largest and smallest element in the subarray.
+
+Return *the **sum of all** subarray ranges of* `nums`*.*
+
+一个数字是多少个子数组的最值?
+
+```python
+class Solution:
+    def subArrayRanges(self, nums: List[int]) -> int:
+        # [1] 3 5 (2) 3 [1]
+        # 0   1 2  3  4  5
+
+        # 1 1
+        #-1,1 ->1
+        #-1,2 -> 2 * 1
+
+        # count: min for how many intervals?
+        # inc stack, left is left bound, be popped by right bound
+
+        # count: max for how many intervals?
+        # dec stack, left is left bound, be popped by left bound
+
+        def f(compareFunc):
+            res = 0
+            s = [-1]
+            for i in range(len(nums)):
+                while len(s) > 1 and compareFunc(nums[i], nums[s[-1]]):
+                    idx = s.pop()
+                    left = s[-1]
+                    right = i
+                    res += (idx - left) * (right - idx) * nums[idx]
+                s.append(i)
+            for i in range(1, len(s)):
+                left = s[i - 1]
+                right = len(nums)
+                idx = s[i]
+                res += (idx - left) * (right - idx) * nums[idx]
+            return res
+ 
+        cntMin = f(lambda *args: args[0] < args[1])
+        cntMax = f(lambda *args: args[0] > args[1])
+        return cntMax - cntMin
+
+```
+
