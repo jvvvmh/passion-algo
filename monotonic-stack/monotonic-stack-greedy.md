@@ -354,3 +354,65 @@ class Solution:
         return ans
 ```
 
+### [2030. Smallest K-Length Subsequence With Occurrences of a Letter](https://leetcode.cn/problems/smallest-k-length-subsequence-with-occurrences-of-a-letter/)
+
+**Example 2:**
+
+```
+Input: s = "leetcode", k = 4, letter = "e", repetition = 2
+Output: "ecde"
+Explanation: "ecde" is the lexicographically smallest subsequence of length 4 that has the letter "e" appear at least 2 times.
+```
+
+```python
+class Solution:
+    def smallestSubsequence(self, s: str, k: int, letter: str, repetition: int) -> str:
+        # pop if (1) ch is smaller (2) have at least k remaining (3) have at least rep letters
+        numLetter = 0
+        for ch in s:
+            if ch == letter:
+                numLetter += 1
+        stk = ""
+        n = len(s)
+        idx = None
+        needPop = 0
+        for i, ch in enumerate(s):
+            while stk and ch < stk[-1] and (len(stk) - 1 + n - 1 - i + 1) >= k:
+                if stk[-1] == letter:
+                    if numLetter - 1 < repetition:
+                        break
+                    else:
+                        numLetter -= 1
+                stk = stk[:-1]
+            stk += ch
+            
+            # 超出了，可以pop其他字符，但是不一定可以pop letter，先append再说
+            # 先记录在 needPop 里面最后反向 pop 大的
+
+            if len(stk) > k:
+                if stk[-1] != letter:
+                    stk = stk[:-1]
+                else:
+                    if numLetter - 1 < repetition:
+                        # cannot pop -1, should the max character which != letter
+                        k += 1
+                        needPop += 1
+                    else:
+                        # can pop
+                        stk = stk[:-1]
+                        numLetter -= 1
+        addBackLetter = 0
+        for i in range(len(stk) - 1, -1, -1):
+            if needPop == 0:
+                break
+            if stk[i] == letter:
+                addBackLetter += 1
+                stk = stk[:-1]
+            else:
+                needPop -= 1
+                stk = stk[:-1]
+        stk += letter * addBackLetter
+        return stk
+        
+```
+
