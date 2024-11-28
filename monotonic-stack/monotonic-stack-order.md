@@ -658,3 +658,66 @@ class Solution:
             ans[i] = max(ans[i + 1], d.get(i + 1, -1))
         return ans
 ```
+
+### [1996. The Number of Weak Characters in the Game](https://leetcode.cn/problems/the-number-of-weak-characters-in-the-game/)
+
+A character is said to be **weak** if any other character has **both** attack and defense levels **strictly greater** than this character's attack and defense levels.
+
+```python
+class Solution:
+    def numberOfWeakCharacters(self, properties: List[List[int]]) -> int:
+
+        # 1 3 / 1 3/ 1 2 / 3 6 / 5 5/ 6 3
+        # 先按照a[0]排序 (a[0], -a[1])
+        # 然后看a[1], 右边第一个比自己严格大的在不在? 被 pop -> weak
+
+        # 也不需要单调栈
+        ans = 0
+        properties.sort(key=lambda x: (x[0], -x[1]))
+        maxR = properties[-1][1]
+        for i in range(len(properties) - 2, -1, -1):
+            if maxR > properties[i][1]:
+                ans += 1
+            else:
+                maxR = properties[i][1]
+        return ans
+ 
+        # 单调栈:
+        properties.sort(key=lambda x: (x[0], -x[1]))
+        res = 0
+        s = []
+        for x in properties:
+            while s and x[1] > s[-1]:
+                s.pop()
+                res += 1
+            s.append(x[1])
+        return res
+```
+
+```c++
+class Solution {
+public:
+    int numberOfWeakCharacters(vector<vector<int>>& properties) {
+        // 按第一维从大到小排序, 第二维从小到大
+        sort(
+            properties.begin(),
+            properties.end(),
+            [] (const vector<int> & a, const vector<int> & b) {
+                return a[0] == b[0] ? (a[1] < b[1]) : (a[0] > b[0]);
+            }
+        );
+
+        int maxSecond = -1;
+        int ans = 0;
+        for (const auto & p: properties) {
+            if (maxSecond > p[1]) {
+                ++ans;
+            } else {
+                maxSecond = p[1];
+            }
+        }
+        return ans;
+    }
+};
+```
+
