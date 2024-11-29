@@ -770,3 +770,61 @@ class Solution:
 
 ```
 
+
+
+
+
+### [2281. Sum of Total Strength of Wizards](https://leetcode.cn/problems/sum-of-total-strength-of-wizards/)
+
+For a **subarray** of `strength`， the **total strength** is defined as the **product** of the following two values:
+
+- The strength of the **weakest** wizard in the group.
+- The **total** of all the individual strengths of the wizards in the group.
+
+```python
+class Solution:
+    def totalStrength(self, strength: List[int]) -> int:
+        n = len(strength)
+        # prefix sum
+        s = [0] * n
+        s[0] = strength[0]
+        for i in range(1, n):
+            s[i] = s[i - 1] + strength[i]
+        
+        # 前缀和的前缀和
+        ss = [0] * n
+        ss[0] = s[0]
+        for i in range(1, n):
+            ss[i] = ss[i - 1] + s[i]
+
+        res = 0
+        s = [-1]
+
+        def calcValue(left, right):
+            v1 = ss[right]
+            v2 = ss[idx - 1] if idx - 1 >= 0 else 0
+            v3 = ss[left - 2] if left - 2 >= 0 else 0
+            return (idx - left + 1) * (v1 - v2) - (right - idx + 1) * (v2 - v3)
+
+        for i in range(n):
+            while len(s) > 1 and strength[i] <= strength[s[-1]]:
+                idx = s.pop()
+                left = s[-1] + 1
+                right = i - 1
+                res += calcValue(left, right) * strength[idx]
+            s.append(i)
+
+        print(s, res)
+        
+        # 还剩下单调递增栈
+        m = 10 ** 9 + 7
+        for i in range(1, len(s)):
+            idx = s[i]
+            left = s[i - 1] + 1
+            right = n - 1
+            res += calcValue(left, right) * strength[idx]
+            res = res % m
+
+        return res
+```
+
