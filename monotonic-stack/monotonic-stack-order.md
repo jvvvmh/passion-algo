@@ -828,3 +828,37 @@ class Solution:
         return res
 ```
 
+### [2282. Number of People That Can Be Seen in a Grid](https://leetcode.cn/problems/number-of-people-that-can-be-seen-in-a-grid/)
+
+可以看到右边/下方的人，要求中间人都严格小于我们。
+
+```python
+class Solution:
+    def seePeople(self, heights: List[List[int]]) -> List[List[int]]:
+        m, n = len(heights), len(heights[0])
+        ans = [[0] * n for _ in range(m)]
+        for i in range(m):
+            s = []
+            for j in range(n - 1, -1, -1):
+                while s and heights[i][j] > heights[i][s[-1]]:
+                    s.pop()
+                    ans[i][j] += 1
+                if s:
+                    if heights[i][j] == heights[i][s[-1]]:
+                        s.pop()
+                    ans[i][j] += 1
+                s.append(j)
+        for j in range(n):
+            s = []
+            for i in range(m - 1, -1, -1):
+                while s and heights[i][j] > heights[s[-1]][j]:
+                    s.pop()
+                    ans[i][j] += 1
+                if s:
+                    if heights[i][j] == heights[s[-1]][j]:
+                        s.pop()
+                    ans[i][j] += 1
+                s.append(i)
+        return ans
+```
+
