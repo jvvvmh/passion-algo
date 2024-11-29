@@ -862,3 +862,41 @@ class Solution:
         return ans
 ```
 
+
+
+
+### [2289. Steps to Make Array Non-decreasing](https://leetcode.cn/problems/steps-to-make-array-non-decreasing/) 难
+
+In one step, **remove** all elements `nums[i]` where `nums[i - 1] > nums[i]`
+
+真的会让step增加的是  7 (41) (51) (61) 这样的序列. 第一步之后, 还有 7 5 6。7 .. 5 6
+
+7有两步数才到5, 然后有3步才到6. 最后7的T=3. 如果7左边有10, 尽管10有一步到7, 但是max(1, 3)=3. 
+
+5 4 3 2 1只需要一步就只剩下5了
+
+```python
+class Solution:
+    def totalSteps(self, nums: List[int]) -> int:
+        # 12 7 (5 2 1) (6 3 2)
+        #       T=1      T=1 
+        # 对于  7 5(1) 6(1)
+        #        max(1,1)=1 max(1,2)=2
+        # 12 7(T=2)
+        # max(1,2)=2
+
+        s = [] # 存(value, t)
+        res = 0
+        for i in range(len(nums) - 1, -1, -1):
+            num = nums[i]
+            # pop ->
+            t = 0
+            while s and num > s[-1][0]:
+                _, t0 = s.pop()
+                t += 1
+                t = max(t, t0)
+            res = max(res, t)
+            s.append((num, t))
+        return res
+```
+
