@@ -953,3 +953,26 @@ class Solution:
         return max(dp)
 ```
 
+### [2454. Next Greater Element IV](https://leetcode.cn/problems/next-greater-element-iv/) 优先队列
+
+右边第二个比自己打的数字
+
+```python
+class Solution:
+    def secondGreaterElement(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        res = [-1] * n
+        s = []
+        q = [] # (value, idx) 从小到大排 
+               # cache 那些已经被pop一次的数字，等待pop第二次
+        for i in range(n):
+            while q and nums[i] > q[0][0]:
+                res[q[0][1]] = nums[i]
+                heapq.heappop(q)
+            while s and nums[i] > nums[s[-1]]:
+                heapq.heappush(q, (nums[s[-1]], s[-1]))
+                s.pop()
+            s.append(i)
+        return res
+```
+
