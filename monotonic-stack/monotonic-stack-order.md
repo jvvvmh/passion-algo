@@ -900,3 +900,56 @@ class Solution:
         return res
 ```
 
+### [2355. Maximum Number of Books You Can Take](https://leetcode.cn/problems/maximum-number-of-books-you-can-take/)
+
+从子数组拿书，但是书必须严格单调递增。找到第一次break等差数列的地方。
+
+**Example 1:**
+
+```
+Input: books = [8,5,2,7,9]
+Output: 19
+Explanation:
+- Take 1 book from shelf 1.
+- Take 2 books from shelf 2.
+- Take 7 books from shelf 3.
+- Take 9 books from shelf 4.
+You have taken 19 books, so return 19.
+It can be proven that 19 is the maximum number of books you can take.
+```
+
+```python
+class Solution:
+    def maximumBooks(self, books: List[int]) -> int:
+        # arr[i] arr[i]-1   arr[i]-2
+        #    i       i-1     i-2
+        # arr[j] < arr[i] - (i - j) 需要停止
+        # arr[j] - j < arr[i] - i
+        # 从j开始是独立的较小的书本，已经求过 (-1)
+        # 不然就是-1等差数列  j + 1 -> i
+        #                             num[i]... nums[i] - (i-j+1)
+        n = len(books)
+        nums = [books[i] - i for i in range(n)]
+    
+        # 求左边第一个比自己严格小的
+        leftIdx = [-1] * n
+        s = [-1]
+        for i in range(n):
+            while len(s) > 1 and nums[i] <= nums[s[-1]]:
+                s.pop()
+            leftIdx[i] = s[-1]
+            s.append(i)
+ 
+        dp = [0] * n
+        for i in range(n):
+            j = leftIdx[i]
+            # from j+1 -> i
+            up = books[i]
+            down = max(books[i] - (i - (j + 1)), 0)
+            dp[i] = (up + down) * (up - down + 1) // 2
+            if j != -1:
+                dp[i] += dp[j]
+ 
+        return max(dp)
+```
+
