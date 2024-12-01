@@ -976,3 +976,47 @@ class Solution:
         return res
 ```
 
+### [2617. Minimum Number of Visited Cells in a Grid](https://leetcode.cn/problems/minimum-number-of-visited-cells-in-a-grid/) 二维优先队列
+
+原点出发，每次可以向右或者下方走最多`grid[i][j]`格。求最短路径。
+
+```python
+class Solution:
+    def minimumVisitedCells(self, grid: List[List[int]]) -> int:
+        m, n = len(grid), len(grid[0])
+        if m == 1 and n == 1:
+            return 1
+        
+        colQ = [[] for _ in range(n)]
+        for i in range(m):
+            rowQ = []
+            for j in range(n):
+                if i == 0 and j == 0:
+                    heapq.heappush(rowQ, (1, j))
+                    heapq.heappush(colQ[j], (1, i))
+                else:
+                    # 从左边来
+                    tmp = float('inf')
+                    while rowQ:
+                        step, y = rowQ[0]
+                        if y + grid[i][y] >= j:
+                            tmp = min(tmp, step + 1)
+                            break
+                        else:
+                            heapq.heappop(rowQ)
+                    # 从上面来
+                    while colQ[j]:
+                        step, x = colQ[j][0]
+                        if x + grid[x][j] >= i:
+                            tmp = min(tmp, step + 1)
+                            break
+                        else:
+                            heapq.heappop(colQ[j])
+                    if tmp != float('inf'):
+                        heapq.heappush(rowQ, (tmp, j))
+                        heapq.heappush(colQ[j], (tmp, i))
+                if i == m - 1 and j == n - 1:
+                    return tmp if tmp != float('inf') else -1
+        return -1
+```
+
