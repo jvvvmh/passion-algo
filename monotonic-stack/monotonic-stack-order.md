@@ -1068,3 +1068,154 @@ class Solution:
         return ans
 ```
 
+### [2818. Apply Operations to Maximize Score](https://leetcode.cn/problems/apply-operations-to-maximize-score/)
+
+元素的真实value是它prime factor的个数。要用到pow(x,y,mod)
+
+start with a score of `1`. You have to maximize your score by applying the following operation at most `k` times:
+
+- Choose any **non-empty** subarray `nums[l, ..., r]` that you haven't chosen previously.
+- Choose an element `x` of `nums[l, ..., r]` with the highest **prime score**. If multiple such elements exist, choose the one with the smallest index.
+- Multiply your score by `x`.
+
+The **prime score** of an integer `x` is equal to the number of distinct prime factors of `x`. For example, the prime score of `300` is `3` since `300 = 2 * 2 * 3 * 5 * 5`.
+
+Return *the **maximum possible score** after applying at most* `k` *operations*.
+
+Since the answer may be large, return it modulo `10^9 + 7`.
+
+```python
+class Solution:
+    def maximumScore(self, nums: List[int], k: int) -> int:
+        # num of factors
+        # prime -> 0
+        MAXN = max(2, max(nums))
+        nFact = [0] * (MAXN + 1)
+        for i in range(2, MAXN + 1):
+            if nFact[i] == 0:
+                for j in range(i, MAXN + 1, i):
+                    nFact[j] += 1
+        # print([nFact[i] for i in nums])
+
+        # 左边 >= 自己，右边严格大于自己的数字
+        # （不严格）单调递减栈
+        n = len(nums)
+        leftIdx = [-1] * n
+        rightIdx = [n] * n
+        s = []
+        for i in range(n):
+            while s and nFact[nums[i]] > nFact[nums[s[-1]]]:
+                rightIdx[s.pop()] = i
+            if s:
+                leftIdx[i] = s[-1]
+            s.append(i)
+        # 还剩下一些，他们的右边界已经是n，左边界都在加入时更新了
+ 
+        sortedNums = sorted([(num, i) for i, num in enumerate(nums)], key=lambda x: -x[0])
+        ans = 1
+        m = 10 ** 9 + 7
+ 
+        for num, idx in sortedNums:
+            tmp = (idx - leftIdx[idx]) * (rightIdx[idx] - idx)
+            tmp = min(tmp, k) 
+            ans = (ans * pow(num, tmp, m)) % m
+            k -= tmp
+            if k == 0:
+                break
+        return ans
+```
+
+ 
+
+### [2863. Maximum Length of Semi-Decreasing Subarrays](https://leetcode.cn/problems/maximum-length-of-semi-decreasing-subarrays/)
+
+You are given an integer array `nums`.
+
+Return *the length of the **longest semi-decreasing** subarray of* `nums`*, and* `0` *if there are no such subarrays.*
+
+- A non-empty array is **semi-decreasing** if its first element is **strictly greater** than its last element.
+
+**Example 1:**
+
+```
+Input: nums = [7,6,5,4,3,2,1,6,10,11]
+Output: 8
+Explanation: Take the subarray [7,6,5,4,3,2,1,6].
+```
+
+```python
+class Solution:
+    def maxSubarrayLength(self, nums: List[int]) -> int:
+        # 6 5 11 4 10 5 8
+        s = [0]
+        for i in range(1, len(nums)):
+            if nums[i] > nums[s[-1]]:
+                s.append(i)
+        res = 0
+        for j in range(len(nums) - 1, -1, -1):
+            while s and nums[s[-1]] > nums[j]:
+                idx = s.pop() # pop 表示ok
+                res = max(res, j - idx + 1)
+        return res
+        
+        # # 7 6 7 6 5 4
+        # # 10.(10). [7(2)] 7[0] 6(1) 6(3) 5 4 
+        # sortedNums = sorted([(num, i) for i, num in enumerate(nums)], key=lambda x: (-x[0], -x[1]))
+        # maxNum, maxIdx = sortedNums[0]
+        # ans = 0
+        # for num, idx in sortedNums[1:]:
+        #     if num >= maxNum or idx < maxIdx:
+        #         maxNum = num
+        #         maxIdx = idx
+        #     else:
+        #         ans = max(ans, idx - maxIdx + 1)
+        # return ans
+```
+
+ 
+
+### [2865. Beautiful Towers I](https://leetcode.cn/problems/beautiful-towers-i/)
+
+remove some bricks to form a **mountain-shaped** tower arrangement. In this arrangement, the tower heights are non-decreasing, reaching a maximum peak value with one or multiple consecutive towers and then non-increasing.
+
+Return the **maximum possible sum** of heights of a mountain-shaped tower arrangement.
+
+```python
+class Solution:
+    def maximumSumOfHeights(self, heights: List[int]) -> int:
+        # 找到左侧最近的 idx, h[idx] <= h[i]
+        # left[idx] + (idx+1 -> i-1) * h[i]
+        n = len(heights)
+        left = [0] * n
+        s = []
+        for i in range(n):
+            while s and heights[i] < heights[s[-1]]:
+                s.pop()
+            idx = s[-1] if s else -1
+            left[i] = (i - 1 - (idx + 1) + 1 + 1) * heights[i]
+            if idx != -1:
+                left[i] += left[idx]
+            s.append(i)
+        
+        # 单调递增
+
+        # 找到右侧最近的 idx, h[idx] <= h[i]
+        # left[idx] + (i+1 -> idx-1) * h[i]
+        right = [0] * n
+        s = []
+        for i in range(n - 1, -1, -1):
+            while s and heights[i] < heights[s[-1]]:
+                s.pop()
+            idx = s[-1] if s else n
+            right[i] = (idx - 1 - (i + 1) + 1 + 1) * heights[i]
+            if idx != n:
+                right[i] += right[idx]
+            s.append(i)
+
+        res = 0
+        for i in range(n):
+            res = max(res, left[i] + right[i] - heights[i])
+        return res
+```
+
+ 
