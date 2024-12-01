@@ -1020,3 +1020,51 @@ class Solution:
         return -1
 ```
 
+### [2736. Maximum Sum Queries](https://leetcode.cn/problems/maximum-sum-queries/)　Hard
+
+You are given two **0-indexed** integer arrays `nums1` and `nums2`, each of length `n`, and a **1-indexed 2D array** `queries` where `queries[i] = [xi, yi]`.
+
+For the `ith` query, find the **maximum value** of `nums1[j] + nums2[j]` among all indices `j` `(0 <= j < n)`, where `nums1[j] >= xi` and `nums2[j] >= yi`, or **-1** if there is no `j` satisfying the constraints.
+
+
+
+1. x 要从大到小看，这样x永远不是bottleneck
+
+2. (y, sum) : x变小, y变小, 丢弃; x变小, y变大, sum可能大也可能小
+
+   如果 y变大, sum变大, 那么丢弃之前的 stack
+
+   所以 stack 中, y变大, sum一定变小.
+
+   给定要求的y_min, 只需要找到y_min的lower_bound.
+
+```python
+class Solution:
+    def maximumSumQueries(self, nums1: List[int], nums2: List[int], queries: List[List[int]]) -> List[int]:
+        # nums中，相同的x，只保留y大的
+        # x减小，必须有y增加，才考虑
+        # (y, sum) < (y', sum') < ...那么sum' < sum 不然(y, sum)被pop
+        # 新的qeury, x都满足条件了, y lower bound
+        nums = sorted([(x, y) for x, y in zip(nums1, nums2)], key=lambda x: -x[0])
+        queries = sorted([(q[0], q[1], i) for i, q in enumerate(queries)], key=lambda x: -x[0])
+        n = len(queries)
+        ans = [-1] * n
+ 
+        s = []
+        j = 0
+        for q0, q1, qIdx in queries:
+            # 更新 stack
+            while j < len(nums) and nums[j][0] >= q0:
+                # update
+                x, y = nums[j]
+                while s and x + y >= s[-1][1]: # 隐含了 y >= s[-1][0]
+                    s.pop()
+                if not s or y > s[-1][0]: # 此时 必有 新sum 较小
+                    s.append((y, x + y))
+                j += 1
+            k = bisect.bisect_left(s, (q1, 0))
+            if k < len(s):
+                ans[qIdx] = s[k][1]
+        return ans
+```
+
