@@ -26,21 +26,34 @@ class Solution:
                 lb = s.pop()
             s.append(num)
         return True
-
-class Solution:
-    def verifyPreorder(self, preorder: List[int]) -> bool:
-        topIdx = -1
-        lb = float('-inf')
-        for num in preorder:
-            if num <= lb:
-                return False
-            while topIdx != -1 and preorder[topIdx] <= num:
-                lb = preorder[topIdx]
-                topIdx -=1
-            topIdx += 1
-            preorder[topIdx] = num
-        return True
 ```
+
+### [LCR 152. 验证二叉搜索树的后序遍历序列](https://leetcode.cn/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/)
+
+```python
+class Solution:
+    def verifyTreeOrder(self, postorder: List[int]) -> bool:
+        # post order: left->right->me
+        # reverse:    me -> right -> left
+        # left pop the largers, the me gives an upper bound
+        # if a new element comes, which belong to the left child, the element should be smaller than me
+        
+        s = []
+        upperBound = float('inf')
+        for i in range(len(postorder) - 1, -1, -1):
+            if postorder[i] > upperBound:
+                return False
+            while s and postorder[i] < s[-1]:
+                upperBound = s.pop()
+            s.append(postorder[i])
+        return True
+
+
+```
+
+
+
+
 
 ### [654. Maximum Binary Tree](https://leetcode.cn/problems/maximum-binary-tree/)
 
