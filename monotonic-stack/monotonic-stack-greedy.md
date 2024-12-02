@@ -553,3 +553,28 @@ class Solution:
         return ans
 ```
 
+### [3229. Minimum Operations to Make Array Equal to Target](https://leetcode.cn/problems/minimum-operations-to-make-array-equal-to-target/) 差分数组
+
+x = targets - nums
+
+构造x from [0...0]
+
+diff元素+1, 那么可以对后面的免费-1
+
+diff元素-1, 那么可以对后面的免费+1
+
+记diff为`x[0], x[1]-x[0] .... ,0-x[n-1]` 总和为0。最后一个元素一般不需要。
+
+考虑diff数组中正的负的，如果第一个数x>0，那么一定给后面负数免费贡献了-x. 正负总是相抵。
+
+只需要返回diff中正数和。
+
+```python
+class Solution:
+    def minimumOperations(self, nums: List[int], target: List[int]) -> int:
+        targets = [0] + [t - num for num, t in zip(nums, target)] + [0]
+        diff = [y - x for x, y in pairwise(targets)]
+        # diff 总和是 0
+        return sum([x for x in diff if x > 0])  
+```
+
