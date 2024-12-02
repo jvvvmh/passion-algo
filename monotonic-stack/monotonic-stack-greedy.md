@@ -530,3 +530,26 @@ class Solution:
         return dp[n - 1]
 ```
 
+### [3205. Maximum Array Hopping Score I](https://leetcode.cn/problems/maximum-array-hopping-score-i/)
+
+In each **hop**, you can jump from index `i` to an index `j > i`, and you get a **score** of `(j - i) * nums[j]`.
+
+```python
+class Solution:
+    def maxScore(self, nums: List[int]) -> int:
+        # 1 2 1 4 [5] 1 3 2 [4] 1 [2] 1 [0]
+        n = len(nums)
+        s = [n - 1]
+        for i in range(n - 2, -1, -1):
+            if nums[i] > nums[s[-1]]:
+                s.append(i)
+        # s is the jump targets
+        if s[-1] != 0:
+            s.append(0)
+        ans = 0
+        for i in range(len(s) - 1):
+            ed, st = s[i], s[i + 1]
+            ans += (ed - st) * nums[ed]
+        return ans
+```
+
