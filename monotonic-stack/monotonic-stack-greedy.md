@@ -416,3 +416,117 @@ class Solution:
         
 ```
 
+
+
+
+
+### [2940. Find Building Where Alice and Bob Can Meet](https://leetcode.cn/problems/find-building-where-alice-and-bob-can-meet/)
+
+If a person is in building `i`, they can move to any other building `j` if and only if `i < j` and `heights[i] < heights[j]`.
+
+You are also given another array `queries` where `queries[i] = [ai, bi]`. On the `ith` query, Alice is in building `ai` while Bob is in building `bi`.
+
+Return *an array* `ans` *where* `ans[i]` *is **the index of the leftmost building** where Alice and Bob can meet on the* `ith` *query*. *If Alice and Bob cannot move to a common building on query* `i`, *set* `ans[i]` *to* `-1`.
+
+ 
+
+```python
+class Solution:
+    def leftmostBuildingQueries(self, heights: List[int], queries: List[List[int]]) -> List[int]:
+        # j之后 第一次大于 max(q1,q2) 的位置
+        # 如果q1>q2
+        # q1 <= q2: 答案就是j
+        n = len(queries)
+        ans = [-1] * n
+        sortedQ = []
+        for i, (idx1, idx2) in enumerate(queries):
+            if idx1 > idx2:
+                idx1, idx2 = idx2, idx1
+            if idx1 == idx2:
+                ans[i] = idx1
+            elif heights[idx1] < heights[idx2]:
+                ans[i] = idx2
+            else:
+                sortedQ.append((idx2, idx1, i))
+        sortedQ.sort(reverse=True)
+        s = []
+    
+        def findLeftMostGE(s, x):
+            l, r = 0, len(s) - 1
+            while l < r:
+                mid = (l + r) // 2
+                midValue = heights[s[mid]]
+                if midValue == x:
+                    l, r = mid, mid
+                elif midValue > x:
+                    l, r = mid + 1, r
+                else:
+                    l, r = l, mid - 1
+            if l > r:
+                l, r = r, l
+            l = max(l-1, 0)
+            r = min(r+1, len(s) - 1)
+            for idx in range(r, l-1,-1):
+                if heights[s[idx]] > x:
+                    return s[idx]
+            return -1
+            
+        j = len(heights) - 1
+        for idx2, idx1, i in sortedQ:
+            while j >= idx2:
+                while s and heights[j] >= heights[s[-1]]:
+                    s.pop()
+                s.append(j)
+                j -= 1
+            pos = findLeftMostGE(s, heights[idx1])
+            ans[i] = pos
+        return ans
+
+```
+
+### [2945. Find Maximum Non-decreasing Array Length](https://leetcode.cn/problems/find-maximum-non-decreasing-array-length/)
+
+可以合并子数组，nums[j+1...i] 变成他们的和。要求单调递增。问最长有多少个元素
+
+```python
+class Solution:
+    def findMaximumLength(self, nums: List[int]) -> int:
+        # dp[i] >= dp[i-1] >... 因为总是可以把最后一个元素加入最后一组，至少保持相同的长度
+        
+        # [0,...,j] | [j+1,...,i]
+        # s[i] - s[j] >= last[j]
+        # 找到一个j
+        # such that s[i] >= last[j] + s[j] 并且 j 尽量大
+        # 由于s[i] 单调递增，所以那些不满足条件的j可以删去
+        # 如果 last[j] + s[j] <= last[j-1] + s[j-1] 那么删去j-1
+        # j = 0,... n 在stack中，那么last[j] + s[j] 必须严格单调递增,/
+
+        # 来了一个 s[i] , 找到最后边的 j, such that  s[i] >= last[j] + s[j]
+        # j 之前的那些都可删去，因为下一个s[i]更大，之前的last[j] + s[i] 都太小了, j也太小了
+        # 找到最后的j: 从头开始删去, as long as s[i] >= last[j] + s[j] 并且 删去后还有一组
+
+        # s[-1]=0, last[-1]=0
+
+        
+        n = len(nums)
+        s = [0] * n
+        s[0] = nums[0]
+        for i in range(1, n):
+            s[i] = s[i - 1] + nums[i]
+        
+        dp = [0] * n
+        q = deque([(-1, 0)]) # 存 (j, last[j]+s[j])
+        for i in range(n):
+            while len(q) >= 2 and q[1][1] <= s[i]: # pop 之后还有满足条件的
+                q.popleft()
+            j, _ = q[0] # 只留下满足条件的最后一个
+            currLast = s[i] - (s[j] if j != -1 else 0)
+            currSum = currLast + s[i]
+            while q and currSum <= q[-1][1]: # 删去次优的j
+                q.pop()
+            q.append((i, currSum))
+            dp[i] = (dp[j] if j != -1 else 0) + 1
+
+        return dp[n - 1]
+```
+
