@@ -1219,3 +1219,33 @@ class Solution:
 ```
 
  
+
+### [3113. Find the Number of Subarrays Where Boundary Elements Are Maximum](https://leetcode.cn/problems/find-the-number-of-subarrays-where-boundary-elements-are-maximum/)
+
+```python
+class Solution:
+    def numberOfSubarrays(self, nums: List[int]) -> int:
+        # 2 (4)_1 3 2 (4)_1 3 (4) 5 3 (4) 8 5
+        # right, first >= me position (1) == ok (2) not ok.
+        # can extend to the next
+        # me as the start, next me -> next next me.... end
+        # save the cnt
+        # 左边第一个>=自己的数字
+        n = len(nums)
+        cnt = [0] * n
+        leftIdx = [-1] * n
+        s = []
+        ans = 0
+        for i, num in enumerate(nums):
+            while s and num > nums[s[-1]]:
+                s.pop()
+            # num <= stack
+            if s:
+                leftIdx[i] = s[-1]
+                if nums[leftIdx[i]] == num:
+                    cnt[i] = cnt[leftIdx[i]] + 1
+                    ans += cnt[i]
+            s.append(i)
+        return ans + len(nums)
+```
+
