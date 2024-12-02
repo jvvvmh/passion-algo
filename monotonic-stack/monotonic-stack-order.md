@@ -1275,3 +1275,24 @@ class Solution:
         return [leftIdx, rightIdx]
 ```
 
+### [面试题 17.21. 直方图的水量](https://leetcode.cn/problems/volume-of-histogram-lcci/)
+
+柱子的位置和高度，能接多少雨水。单调递减栈。
+
+```python
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        s = []
+        ans =0 
+        for i, h in enumerate(height):
+            while s and h >= height[s[-1]]:
+                idx = s.pop()
+                if len(s):
+                    leftIdx = s[-1]
+                    w = i - leftIdx - 1
+                    add = min(height[leftIdx] - height[idx], h - height[idx])
+                    ans += w * add
+            s.append(i)
+        return ans
+```
+
