@@ -578,3 +578,52 @@ class Solution:
         return sum([x for x in diff if x > 0])  
 ```
 
+### [面试题 03.05. 栈排序](https://leetcode.cn/problems/sort-of-stacks-lcci/)
+
+维护stack最小数字在顶。能不倒就不倒。除非peek/pop，或者加入新元素时，新元素太小。
+
+```python
+class SortedStack:
+
+    def __init__(self):
+        self.s1 = []
+        self.s2 = []
+        # [9, 5, 3, 1] 加入 4
+        # [9, 5, 4]   [1 3]
+ 
+    def push(self, val: int) -> None:
+        s1, s2 = self.s1, self.s2
+        while s2 and val < s2[-1]:
+            s1.append(s2.pop())
+        while s1 and val > s1[-1]:
+            s2.append(s1.pop())
+        s1.append(val)
+
+    def pop(self) -> None:
+        s1, s2 = self.s1, self.s2
+        while s2:
+            s1.append(s2.pop())
+        if s1:
+            s1.pop()
+
+    def peek(self) -> int:
+        s1, s2 = self.s1, self.s2
+        while s2:
+            s1.append(s2.pop())
+        return s1[-1] if s1 else -1
+        
+
+    def isEmpty(self) -> bool:
+        s1, s2 = self.s1, self.s2
+        return len(s1) == 0 and len(s2) == 0
+        
+
+
+# Your SortedStack object will be instantiated and called as such:
+# obj = SortedStack()
+# obj.push(val)
+# obj.pop()
+# param_3 = obj.peek()
+# param_4 = obj.isEmpty()
+```
+
