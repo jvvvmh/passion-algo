@@ -1249,3 +1249,29 @@ class Solution:
         return ans + len(nums)
 ```
 
+### [面试题 16.16. 部分排序](https://leetcode.cn/problems/sub-sort-lcci/)
+
+至少sort中间的一部分
+
+```python
+class Solution:
+    def subSort(self, array: List[int]) -> List[int]:
+        # 1 2 3 4 [2] 6 10 [3] 15 19
+        currMax = float('-inf')
+        rightIdx = -1
+        for i in range(len(array)):
+            if array[i] >= currMax:
+                currMax = array[i]
+            else:
+                # 出现逆序对
+                rightIdx = i
+        currMin = float('inf')
+        leftIdx = -1
+        for i in range(len(array) - 1, -1, -1):
+            if array[i] <= currMin:
+                currMin = array[i]
+            else:
+                leftIdx = i
+        return [leftIdx, rightIdx]
+```
+
