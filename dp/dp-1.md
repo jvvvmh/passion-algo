@@ -888,20 +888,65 @@ Find the maximum profit you can achieve. You may complete at most `k` transactio
 **Note:** You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
 
 ```python
-import numpy as np
-
 class Solution:
     def maxProfit(self, k: int, prices: List[int]) -> int:
-        k = min(k , len(prices) // 2)
-        if k <= 0: return 0
-        buy = [float('-inf')] * (k + 1)
-        sell = [float('-inf')] * (k + 1)
-        buy[1] = -prices[0]
+        k = min(k, len(prices) // 2)
+        if k <= 0:
+            return 0
+        n = k + 1
+
+        buy = [float("-inf")] * n
+        sell = [float("-inf")] * n
         sell[0] = 0
-        for idx, p in enumerate(prices[1:]):
-            for i in range(1, min(k, (idx+ 2)//2 + 1) + 1):
-                buy[i], sell[i] = max(buy[i], sell[i - 1] - p), max(sell[i], buy[i] + p)
-        return max(sell)
+
+        buyFrom  = [[] for _ in range(n)] # n x t
+        sellFrom = [[] for _ in range(n)] # n x t
+
+
+        for t, price in enumerate(prices):
+            for i in range(k + 1):
+                newBuyI = max(buy[i], sell[i - 1] - price) if i - 1 >= 0 else buy[i]
+                newSellI = max(sell[i], buy[i] + price)
+
+                if newBuyI == buy[i]:
+                    buyFrom[i].append(("buy", i))
+                else:
+                    buyFrom[i].append(("sell", i - 1))
+
+                if newSellI == sell[i]:
+                    sellFrom[i].append(("sell", i))
+                else:
+                    sellFrom[i].append(("buy", i))
+                
+                buy[i], sell[i] = newBuyI, newSellI
+
+        nDeal = 0
+        maxProfit = 0
+        for i in range(1, k + 1):
+            if sell[i] > maxProfit:
+                maxProfit = sell[i]
+                nDeal = i
+
+        # final state is ("sell", nDeal)
+        # trace the previous t-1 steps
+        steps = [("sell", nDeal)]
+        for t in range(len(prices) - 1, 0, -1):
+            state, deal = steps[-1]
+            if state == "buy":
+                steps.append(buyFrom[deal][t])
+            else:
+                steps.append(sellFrom[deal][t])
+        steps.reverse()
+        prevDeal = 0
+        for i in range(len(steps)):
+            status, currDeal = steps[i]
+            if status == "buy" and currDeal > prevDeal:
+                print(f"buy@{prices[i]}")
+            if status == "sell" and currDeal >= 1 and steps[i - 1][0] == "buy":
+                print(f"sell@{prices[i]}")
+            prevDeal = currDeal
+
+        return maxProfit
 ```
 
 ### [309. Best Time to Buy and Sell Stock with Cooldown](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
