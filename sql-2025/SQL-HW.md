@@ -2,8 +2,6 @@ SQL HW
 
 
 
-
-
 ```sql
 
 -- CREATE DATABASE IF NOT EXISTS SchoolDB;
@@ -12,20 +10,21 @@ SQL HW
 DROP TABLE IF EXISTS Customers; -- , Orders, Shippings;
 DROP TABLE IF EXISTS Shippings; -- , Orders, Shippings;
 DROP TABLE IF EXISTS Orders; -- , Orders, Shippings;
+DROP TABLE IF EXISTS Enrollment;
 DROP TABLE IF EXISTS Students;
 DROP TABLE IF EXISTS Courses;
 DROP TABLE IF EXISTS Enrollment;
 
  
 CREATE TABLE Students (
-student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+student_id  SERIAL PRIMARY KEY  ,
 name VARCHAR(50) NOT NULL,
 age INT,
 grade VARCHAR(10)
 );
 
 CREATE TABLE Courses (
-course_id INTEGER PRIMARY KEY AUTOINCREMENT,
+course_id  SERIAL PRIMARY KEY  ,
 course_name VARCHAR(100) NOT NULL,
 instructor VARCHAR(50)
 ) ;
@@ -100,15 +99,16 @@ SELECT * FROM Students WHERE grade IN ('A', 'B');
 -- 20. Create an Enrollment Table
 
 CREATE TABLE Enrollment (
-    enrollment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    enrollment_id SERIAL PRIMARY KEY  ,
     student_id INT,
     course_id INT,
-    FOREIGN KEY (student_id) REEERENCES Students(student_id),
-    FOREIGN KEY (course_id) REEERENCES Courses(course_id)
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
 );
 
 -- 21. Insert Data into Enrollment Table
-
+INSERT INTO Students (student_id, name, age, grade) VALUES
+(4, 'Diana', 23, 'C');
 INSERT INTO Enrollment (student_id, course_id) VALUES
 (1, 1),
 (1, 2),
@@ -119,7 +119,7 @@ INSERT INTO Enrollment (student_id, course_id) VALUES
 -- 22. Join Students and Enrollment Tables
 SELECT Students.name, Courses.course_name
 FROM Students
-JOIN Enrollment ON Students.student id = Enrollment.student_id
+JOIN Enrollment ON Students.student_id = Enrollment.student_id
 JOIN Courses ON Enrollment.course_id = Courses.course_id;
 
 
@@ -127,17 +127,27 @@ JOIN Courses ON Enrollment.course_id = Courses.course_id;
 SELECT Students.name, Courses.course_name
 FROM Students
 LEFT JOIN Enrollment ON Students.student_id = Enrollment.student_id
-LEET JOIN Courses ON Enrollment.course_id = Courses.course_id;
+LEFT JOIN Courses ON Enrollment.course_id = Courses.course_id;
 
 -- Step 7: Indexing & Optimization
 -- 24. Create an Index on Name
-CREATE INDEX idx_name ON Students (name);
+CREATE INDEX idx_name ON Students(name);
+
+
+
+-- 2. Verify Index Exists
+SELECT indexname, tablename FROM pg_indexes WHERE tablename = 'students';
+
+ 
 
 -- 25. Drop the Index on Name
-DROP INDEX idx_name ON Students;
+DROP INDEX idx_name; -- DROP INDEX idx_name ON Students;
 
 -- 26. Show Indexes on Students Table
-SHOW INDEXES FROM Students;
+-- SHOW INDEXES FROM Students;
+SELECT indexname, tablename, indexdef 
+FROM pg_indexes 
+WHERE tablename = 'students';
 
 
 
@@ -173,8 +183,7 @@ DROP TABLE Enrollment;
 DROP TABLE Courses;
 
 -- 35. Drop the SchooIDB Database
-DROP DATABASE SchooldB;
-
+-- DROP DATABASE SchooldB;
 
 
 
