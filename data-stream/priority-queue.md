@@ -43,3 +43,62 @@ public:
 };
 ```
 
+
+
+[480. Sliding Window Median](https://leetcode.cn/problems/sliding-window-median/)
+
+```c++
+vector<double> f(vector<int> & nums, int w, int k) {
+    // initial k largert nums
+    vector<double> res;
+    multiset<int> s;
+    for (int i = 0; i < w; ++i) {
+        s.insert(nums[i]);
+    }
+    auto ptr = s.begin();
+    for (int i = 0; i < k - 1; ++i) {
+        ++ptr;
+    }
+    res.push_back(*ptr);
+    for (int i = w; i < nums.size(); ++i) {
+        if (nums[i] < *ptr) {
+            s.insert(nums[i]);
+        } else{
+            s.insert(nums[i]);
+            ++ptr; 
+        }
+        
+        if (s.find(nums[i - w]) == ptr) {
+            auto tmp = ptr;
+            ptr--;
+            s.erase(tmp);
+        } else {
+            if (nums[i - w] <= *ptr) {
+                s.erase(s.find(nums[i - w]));
+            } else {
+                --ptr;
+                s.erase(s.find(nums[i - w]));
+            }
+        }
+        res.push_back(*ptr);
+    }
+    return res;
+}
+
+class Solution {
+public:
+    vector<double> medianSlidingWindow(vector<int>& nums, int k) {
+        if (k & 1) {
+            return f(nums, k, k / 2 + 1);
+        }
+        auto v1 = f(nums, k, k / 2);
+        auto v2 = f(nums, k, k / 2 + 1);
+        vector<double> res(v1.size());
+        for (int i = 0; i < v1.size(); ++i) {
+            res[i] = (v1[i] + v2[i]) / 2.;
+        }
+        return res;
+    }
+};
+```
+
